@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
 
     Login() {
         // if (this.FormLogin.valid) {
-            console.log("holas");
+            console.log("Redireccionando a inicio...");
             this._router.navigate(['inicio']);
         // }
     }

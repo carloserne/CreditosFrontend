@@ -1,0 +1,25 @@
+<div class="sidebar estilosidebar">
+    <div class="menu-header">
+        <img src="/assets/images/logoFinanclick.png" alt="Logo" class="logo">
+    </div>
+    <div class="menu-item" (click)="toggleMenu('inicio')">
+        <i class="fas fa-home"></i> Inicio
+    </div>
+    <div class="menu-item" (click)="toggleMenu('simulador')">
+        <i class="fas fa-cogs"></i> Simulador
+        <div *ngIf="expandedMenu === 'simulador'" class="submenu">
+            <p class="submenu-item" (click)="navigateTo('/simulador')">Simular Crédito</p>
+        </div>
+    </div>
+    <div class="menu-item" (click)="toggleMenu('settings')">
+        <i class="fas fa-cogs"></i> Configuración
+        <div *ngIf="expandedMenu === 'settings'" class="submenu">
+            <p class="submenu-item" (click)="navigateTo('/ajustes/ajuste1')">Ajuste 1</p>
+            <p class="submenu-item" (click)="navigateTo('/ajustes/ajuste2')">Ajuste 2</p>
+        </div>
+    </div>
+    <div class="user-section">
+        <img src="/assets/images/user.jpg" alt="User" class="user-image">
+        <span class="user-name">Usuario</span>
+    </div>
+</div>

@@ -8,22 +8,88 @@
             </div>
             <div class="inputs-container">
                 <div class="floating-label">
-                    <input type="text" class="inputM" id="input1" placeholder="Método de cálculo">
-                    <label for="input1">Método de cálculo</label>
+                    <input type="text" class="inputM" id="metodo" placeholder="Método de cálculo">
+                    <label for="metodo">Método de cálculo</label>
                 </div>
                 <div class="floating-label">
-                    <input type="text" class="inputM" id="input2" placeholder="Sub método de calc">
-                    <label for="input2">Método de cálculo</label>
+                    <input type="text" class="inputM" id="submetodo" placeholder="Sub método de calc">
+                    <label for="submetodo">Sub método de calc</label>
                 </div>
                 <div class="floating-label">
-                    <input type="text" class="inputM" id="input3" placeholder="Monto del crédito">
-                    <label for="input3">Monto del crédito</label>
+                    <input type="text" class="inputM" id="monto" placeholder="Monto del crédito">
+                    <label for="monto">Monto del crédito</label>
                 </div>
                 <div class="floating-label">
-                    <input type="text" class="inputM" id="input4" placeholder="Número de créditos">
-                    <label for="input4">Número de créditos</label>
+                    <input type="text" class="inputM" id="numcreditos" placeholder="Número de créditos">
+                    <label for="numcreditos">Número de créditos</label>
                 </div>
             </div>
         </div>
+        <div class="col-12 mt-5">
+            <div class="inputs-container">
+                <div class="floating-label">
+                    <input type="text" class="inputM" id="formapago" placeholder="Forma de pago">
+                    <label for="formapago">Forma de pago</label>
+                </div>
+                <div class="floating-label">
+                    <input type="text" class="inputM" id="fechainicio" placeholder="Fecha de inicio">
+                    <label for="fechainicio">Fecha de inicio</label>
+                </div>
+                <div class="floating-label">
+                    <input type="text" class="inputM" id="interesanual" placeholder="Interés anual">
+                    <label for="interesanual">Interés anual</label>
+                </div>
+                <div class="floating-label">
+                    <input type="text" class="inputM" id="iva" placeholder="IVA">
+                    <label for="iva">IVA</label>
+                </div>
+                <div class="floating-label checkbox-container">
+                    <input type="checkbox" id="ivaExento">
+                    <label for="ivaExento">I.V.A Exento?</label>
+                </div>
+                <div class="floating-label">
+                    <label for="catValor">CAT: Valor</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 card shadow mb-4 p-3">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-line"></i> Tabla de amortización</h6>
+        </div>
+        <fieldset>
+            <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th class=" headerTable-top-left text-center">Pago</th>
+                            <th class="text-center">Otorgamiento</th>
+                            <th class="text-center">Día de vencimiento</th>
+                            <th class="text-center">Días</th>
+                            <th class="text-center">Saldo Insoluto</th>
+                            <th class="text-center">Capital</th>
+                            <th class="text-center">Interés</th>
+                            <th class="text-center">IVA</th>
+                            <th class="text-center">Interés + IVA</th>
+                            <th class="text-center headerTable-top-right">Pago total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td class="text-center">10/07/2024</td>
+                            <td class="text-center">10/08/2024</td>
+                            <td class="text-center">30</td>
+                            <td class="text-center">$10,000</td>
+                            <td class="text-center">$500</td>
+                            <td class="text-center">$50</td>
+                            <td class="text-center">$10</td>
+                            <td class="text-center">$60</td>
+                            <td class="text-center">$560</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
     </div>
 </div>

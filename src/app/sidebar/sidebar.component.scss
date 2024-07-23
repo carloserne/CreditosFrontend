@@ -110,15 +110,15 @@ $color-menu-item: #1A1A2E;
 .logout-button {
     background: transparent;
     border: none;
-    color: #d9534f; /* Rojo para el texto del botón de cerrar sesión */
+    color: #d9534f; 
     cursor: pointer;
     font-size: 16px;
-    padding: 10px; /* Opcional: para hacer el botón más grande y más fácil de hacer clic */
-    border-radius: 4px; /* Opcional: para bordes redondeados */
-    transition: background-color 0.3s, color 0.3s; /* Transición suave para el cambio de color */
+    padding: 10px;
+    border-radius: 4px; 
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .logout-button:hover {
-    background: #bd081c; /* Rojo para el fondo del botón al pasar el cursor */
-    color: #ffffff; /* Blanco para el texto del botón al pasar el cursor */
+    background: #bd081c; 
+    color: #ffffff; 
 }

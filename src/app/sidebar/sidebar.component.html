@@ -2,20 +2,23 @@
     <div class="menu-header">
         <img src="/assets/images/logoFinanclick.png" alt="Logo" class="logo">
     </div>
-    <div class="menu-item" (click)="toggleMenu('inicio')">
-        <i class="fas fa-home"></i> Inicio
+    <div class="menu-item" (click)="navigateTo('/bienvenida')">
+        <div (click)="navigateTo('/bienvenida')">
+            <i class="fas fa-home"></i> Bienvenida
+        </div>
     </div>
     <div class="menu-item" (click)="toggleMenu('simulador')">
-        <i class="fas fa-cogs"></i> Créditos
+        <i class="fas fa-money-bill-wave"></i> Créditos
         <div *ngIf="expandedMenu === 'simulador'" class="submenu">
-            <p class="submenu-item" (click)="navigateTo('/simulador')">Simular Crédito</p>
+            <p class="submenu-item" (click)="navigateTo('/simulador')"><i class="fas fa-calculator"></i> Simular Crédito</p>
         </div>
     </div>
     <div class="menu-item" (click)="toggleMenu('settings')">
         <i class="fas fa-cogs"></i> Configuración
         <div *ngIf="expandedMenu === 'settings'" class="submenu">
-            <p class="submenu-item" (click)="navigateTo('/ajustes/ajuste1')">Ajuste 1</p>
-            <p class="submenu-item" (click)="navigateTo('/ajustes/ajuste2')">Ajuste 2</p>
+            <p class="submenu-item" (click)="navigateTo('/configuracion/empresa')"><i class="fas fa-industry"></i> Empresa</p>
+            <p class="submenu-item" (click)="navigateTo('/configuracion/usuarios')"><i class="fas fa-users"></i> Usuarios</p>
+            <p class="submenu-item" (click)="navigateTo('/configuracion/clientes')"><i class="fas fa-handshake"></i> Clientes</p>
         </div>
     </div>
     <div class="user-section">

@@ -40,15 +40,16 @@ export class SimuladorVistaComponent implements OnInit {
     ngOnInit(): void {}
 
     simular() {
-        this.simuladorService.calcularSimulador().subscribe(
-            (data: ISimulador) => {
-                this.datosSimulador = data;
-                this.mostrarTabla = true;
-            },
-            (error) => {
-                this.toastr.error(error.message, 'Error en la Simulación');
-            }
-        );
+        this.mostrarTabla = true;
+        // this.simuladorService.calcularSimulador().subscribe(
+        //     (data: ISimulador) => {
+        //         this.datosSimulador = data;
+        //         this.mostrarTabla = true;
+        //     },
+        //     (error) => {
+        //         this.toastr.error(error.message, 'Error en la Simulación');
+        //     }
+        // );
     }
 
     limpiar() {

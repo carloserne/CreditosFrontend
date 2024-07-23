@@ -5,32 +5,34 @@
     <div class="card">
         <div class="card2">
             <h2 class="login-header">Iniciar sesión</h2>
-            <form [formGroup]="FormLogin" (keyup.enter)="Login()"> 
-            <div class="widget-body form-group">
-                <div class="form-group">
-                <div class="group">
-                    <input type="text" autocomplete="off" required formControlName="Cuenta">
-                    <label class="MaterialLabel">Cuenta</label>
+            <form [formGroup]="FormLogin" (keyup.enter)="login()"> 
+                <div class="widget-body form-group">
+                    <div class="form-group">
+                        <div class="group">
+                            <input type="text" autocomplete="off" required formControlName="username">
+                            <label class="MaterialLabel">Usuario</label>
+                        </div>
+                        <small style="color: red" 
+                            *ngIf="FormLogin.controls['username'].invalid && (FormLogin.controls['username'].touched || FormLogin.controls['username'].dirty)">
+                            El usuario no es válido
+                        </small> 
+                    </div>
+                    <div class="form-group">
+                        <div class="group password-input-wrapper">
+                            <input [type]="passwordVisible ? 'text' : 'password'" required formControlName="contrasenia">
+                            <label class="MaterialLabel">Contraseña</label>
+                            <span class="password-icon" (click)="togglePasswordVisibility()">
+                                <i *ngIf="!passwordVisible" class="fas fa-eye"></i>
+                                <i *ngIf="passwordVisible" class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
+                        <small style="color: red" 
+                            *ngIf="FormLogin.controls['contrasenia'].invalid && (FormLogin.controls['contrasenia'].touched || FormLogin.controls['contrasenia'].dirty)">
+                            La contraseña no es válida
+                        </small> 
+                    </div>
+                    <button type="button" class="login-button" (click)="login()">Ingresar</button>
                 </div>
-                <small style="color: red" [hidden]="FormLogin.controls['Cuenta'].valid || (FormLogin.controls['Cuenta'].pristine)">
-                    La cuenta no es válida
-                </small> 
-                </div>
-                <div class="form-group">
-                <div class="group password-input-wrapper">
-                    <input [type]="passwordVisible ? 'text' : 'password'" required formControlName="Clave">
-                    <label class="MaterialLabel">Contraseña</label>
-                    <span class="password-icon" (click)="togglePasswordVisibility()">
-                    <i *ngIf="!passwordVisible" class="fas fa-eye"></i>
-                    <i *ngIf="passwordVisible" class="fas fa-eye-slash"></i>
-                    </span>
-                </div>
-                <small style="color: red" [hidden]="FormLogin.controls['Clave'].valid || (FormLogin.controls['Clave'].pristine)">
-                    La contraseña no es válida
-                </small> 
-                </div>
-                <button type="button" class="login-button" (click)="Login()">Ingresar</button>
-            </div>
             </form>
         </div>
     </div>

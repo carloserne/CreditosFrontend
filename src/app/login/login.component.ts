@@ -23,23 +23,25 @@ export class LoginComponent implements OnInit {
         });
     }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        localStorage.removeItem('token');
+    }
 
     login() {
-        // if (this.FormLogin.valid) {
-        //     const { username, contrasenia } = this.FormLogin.value;
-        //     this.loginService.login(username, contrasenia).subscribe(
-        //         (response) => {
-        //             this._router.navigate(['/inicio']);
-        //         },
-        //         (error) => {
-        //             this.toastr.error(error.message, 'Inicio incorrecto');
-        //         }
-        //     );
-        // } else {
-        //     this.toastr.error('Llene todos los campos', 'Error de validación');
-        // }
-        this._router.navigate(['/bienvenida']);
+        if (this.FormLogin.valid) {
+            const { username, contrasenia } = this.FormLogin.value;
+            this.loginService.login(username, contrasenia).subscribe(
+                (response) => {
+                    localStorage.setItem('token', response);
+                    this._router.navigate(['/bienvenida']);
+                },
+                (error) => {
+                    this.toastr.error("Error de credenciales", 'Inicio incorrecto');
+                }
+            );
+        } else {
+            this.toastr.error('Llene todos los campos', 'Error de validación');
+        }
     }
 
     togglePasswordVisibility() {

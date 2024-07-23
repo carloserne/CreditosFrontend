@@ -22,7 +22,12 @@
         </div>
     </div>
     <div class="user-section">
-        <img src="/assets/images/user.jpg" alt="User" class="user-image">
-        <span class="user-name">Usuario</span>
+        <div class="user-info">
+            <img src="/assets/images/user.jpg" alt="User" class="user-image">
+            <span class="user-name">Usuario</span>
+        </div>
+        <button (click)="logout()" class="logout-button">
+            <i class="fas fa-sign-out-alt"></i>Cerrar sesión
+        </button>
     </div>
 </div>

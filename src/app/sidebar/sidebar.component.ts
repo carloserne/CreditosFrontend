@@ -23,6 +23,11 @@ export class SidebarComponent {
         }
     }
 
+    logout() {
+        localStorage.removeItem('token');
+        this.router.navigate(['/login']);
+    }
+
     navigateTo(route: string): void {
         this.router.navigate([route]);
     }

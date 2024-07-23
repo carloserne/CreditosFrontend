@@ -33,6 +33,8 @@ $CreditosFrontEnd-theme: mat.define-theme((
 /* Comment out the line below if you want to use the deprecated `color` inputs. */
 /* @include mat.color-variants-backwards-compatibility($CreditosFrontEnd-theme); */
 
+@import 'ngx-toastr/toastr';
+
 $color-azulfuerte: #023E73;
 $color-azulbajo: #035AA6;
 $color-verdefuerte: #528C18;
@@ -71,7 +73,7 @@ body {
     font-family: 'Arial', sans-serif;
     color: #fff;
     background-color: $color-azulfuerte;
-    border-radius: 20px;
+    border-radius: 5px;
     padding: 10px 40px;
     text-align: center;
     display: flex;
@@ -148,27 +150,29 @@ label {
 }
 
 .headerTable-top-left {
-    border-top-left-radius: 10px;
-    background-color: #371559;
+    border-top-left-radius: 10px !important;
+    background-color: $color-verdefuerte !important;
+    color: white !important;
 }
 
 .headerTable-top-right {
-    cursor: pointer;
-    border-top-right-radius: 10px;
-    background-color: #371559;
+    border-top-right-radius: 10px !important;
+    background-color: $color-verdefuerte !important;
+    color: white !important;
 }
 
 thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: #371559;
-    color: white;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1 !important;
+    background-color: $color-verdefuerte !important;
+    color: white !important;
 }
 
 thead th {
-    background-color: #371559;
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
+    background-color: $color-verdefuerte !important;
+    color: white !important;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4)  !important;
 }
 
 .table th, .table td {

@@ -24,6 +24,11 @@ export class LoginService {
             );
     }
 
+    isLogged(): boolean {
+        const token = localStorage.getItem('token');
+        return token? true : false;
+    }
+
     getUsuarioDetail(): Observable<IUsuario> {
         const token = localStorage.getItem('token');
         if (!token) {

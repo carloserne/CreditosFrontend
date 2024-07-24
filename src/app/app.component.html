@@ -1,2 +1,4 @@
-<!-- <app-login></app-login> -->
-<router-outlet></router-outlet>
+<app-sidebar *ngIf="mostrarSidebar"></app-sidebar>
+<div [ngClass]="{'content': mostrarSidebar, 'full-screen': !mostrarSidebar}">
+    <router-outlet></router-outlet>
+</div>

@@ -1,164 +1,117 @@
-<app-sidebar></app-sidebar>
-<div class="content">
-    <h3 class="titulo">Simulador de crédito</h3>
-    <div class="col-12 card shadow mb-4 p-3">
-        <form [formGroup]="simuladorForm">
-            <div class="col-12">
-                <div class="mb-3">
-                    <h5 class="subtitulo">Datos generales del crédito</h5>
-                </div>
-                <div class="inputs-container">
-                    <div class="floating-label">
-                        <input type="text" class="inputM" id="metodo" placeholder="Método de cálculo" formControlName="metodo">
-                        <label for="metodo">Método de cálculo</label>
-                    </div>
-                    <div class="floating-label">
-                        <input type="text" class="inputM" id="submetodo" placeholder="Sub método de calc" formControlName="submetodo">
-                        <label for="submetodo">Sub método de calc</label>
-                    </div>
-                    <div class="floating-label">
-                        <input type="number" class="inputM" id="monto" placeholder="Monto del crédito" formControlName="monto">
-                        <label for="monto">Monto del crédito</label>
-                    </div>
-                    <div class="floating-label">
-                        <input type="number" class="inputM" id="numpagos" placeholder="Número de pagos" formControlName="numpagos">
-                        <label for="numpagos">Número de pagos</label>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 mt-5">
-                <div class="inputs-container">
-                    <div class="floating-label">
-                        <select class="inputM" id="formaPago" formControlName="formaPago">
-                            <option value="" disabled selected>Seleccione una forma de pago</option>
-                            <option value="quincenal">Quincenal</option>
-                            <option value="mensual">Mensual</option>
-                            <option value="anual">Anual</option>
-                        </select>
-                        <label for="formaPago">Forma de pago</label>
-                    </div>
-                    <div class="floating-label">
-                        <input type="date" class="inputM" id="fechaInicio" placeholder="Fecha de inicio" formControlName="fechaInicio">
-                        <label for="fechaInicio">Fecha de inicio</label>
-                    </div>
-                    <div class="floating-label">
-                        <input type="number" class="inputM" id="interesAnual" placeholder="Interés anual" formControlName="interesAnual">
-                        <label for="interesAnual">Interés anual</label>
-                    </div>
-                    <div class="floating-label">
-                        <input type="number" class="inputM" id="iva" placeholder="IVA" formControlName="iva">
-                        <label for="iva">IVA</label>
-                    </div>
-                    <div class="floating-label checkbox-container">
-                        <input type="checkbox" id="ivaExento" formControlName="ivaExento">
-                        <label for="ivaExento">I.V.A Exento?</label>
-                    </div>
-                    <div class="floating-label">
-                        <label for="catValor">CAT: Valor</label>
-                    </div>
-                </div>
-                <div class="text-center">
-                <button type="button" class="btn btn-success" style="margin-top: 20px;" (click)="simular()">Simular</button>
-                <button type="button" class="btn btn-warning" style="margin-top: 20px; margin-left: 10px; color: white;" (click)="limpiar()">Limpiar</button>
-                <!-- Botón para abrir el modal -->
-                <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                    Launch static backdrop modal
-                </button> -->
-                </div>
-            </div>
-        </form>
-    </div>
-    <div *ngIf="mostrarTabla" class="col-12 card shadow mb-4 p-3">
-    <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-line"></i> Tabla de amortización</h6>
-    </div>
-    <fieldset>
-        <div class="no-padding table-responsive table-hover" style="margin-top: 20px; font-size: 13px;">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th class="text-center headerTable-top-left">Pago</th>
-                        <th class="text-center">Otorgamiento</th>
-                        <th class="text-center">Día de vencimiento</th>
-                        <th class="text-center">Días</th>
-                        <th class="text-center">Saldo Insoluto</th>
-                        <th class="text-center">Capital</th>
-                        <th class="text-center">Interés</th>
-                        <th class="text-center">IVA</th>
-                        <th class="text-center">Interés + IVA</th>
-                        <th class="text-center headerTable-top-right">Pago total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Aqui debemos de poner los datos recibidos -->
-                    <tr class="text-center">
-                        <td>1</td>
-                        <td>10/07/2024</td>
-                        <td>10/08/2024</td>
-                        <td>30</td>
-                        <td>$10,000</td>
-                        <td>$500</td>
-                        <td>$50</td>
-                        <td>$10</td>
-                        <td>$60</td>
-                        <td>$560</td>
-                    </tr>
-                    <tr class="text-center">
-                        <td>1</td>
-                        <td>10/07/2024</td>
-                        <td>10/08/2024</td>
-                        <td>30</td>
-                        <td>$10,000</td>
-                        <td>$500</td>
-                        <td>$50</td>
-                        <td>$10</td>
-                        <td>$60</td>
-                        <td>$560</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </fieldset>
-    </div>
-</div>
 
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<h3 class="titulo">Simulador de crédito</h3>
+<div class="col-12 card shadow mb-4 p-3">
+    <form [formGroup]="simuladorForm">
+        <div class="col-12">
+            <div class="mb-3">
+                <h5 class="subtitulo">Datos generales del crédito</h5>
             </div>
-            <div class="modal-body">
-                <div class="container">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Método" id="metodo">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Plazo" id="plazo">
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Tasa" id="tasa">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Interés" id="interes">
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="IVA" id="iva">
-                        </div>
-                    </div>
+            <div class="inputs-container">
+                <div class="floating-label">
+                    <input type="text" class="inputM" id="metodo" placeholder="Método de cálculo" formControlName="metodo">
+                    <label for="metodo">Método de cálculo</label>
+                </div>
+                <div class="floating-label">
+                    <input type="text" class="inputM" id="submetodo" placeholder="Sub método de calc" formControlName="submetodo">
+                    <label for="submetodo">Sub método de calc</label>
+                </div>
+                <div class="floating-label">
+                    <input type="number" class="inputM" id="monto" placeholder="Monto del crédito" formControlName="monto">
+                    <label for="monto">Monto del crédito</label>
+                </div>
+                <div class="floating-label">
+                    <input type="number" class="inputM" id="numpagos" placeholder="Número de pagos" formControlName="numpagos">
+                    <label for="numpagos">Número de pagos</label>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Understood</button>
+        </div>
+        <div class="col-12 mt-5">
+            <div class="inputs-container">
+                <div class="floating-label">
+                    <select class="inputM" id="formaPago" formControlName="formaPago">
+                        <option value="" disabled selected>Seleccione una forma de pago</option>
+                        <option value="quincenal">Quincenal</option>
+                        <option value="mensual">Mensual</option>
+                        <option value="anual">Anual</option>
+                    </select>
+                    <label for="formaPago">Forma de pago</label>
+                </div>
+                <div class="floating-label">
+                    <input type="date" class="inputM" id="fechaInicio" placeholder="Fecha de inicio" formControlName="fechaInicio">
+                    <label for="fechaInicio">Fecha de inicio</label>
+                </div>
+                <div class="floating-label">
+                    <input type="number" class="inputM" id="interesAnual" placeholder="Interés anual" formControlName="interesAnual">
+                    <label for="interesAnual">Interés anual</label>
+                </div>
+                <div class="floating-label">
+                    <input type="number" class="inputM" id="iva" placeholder="IVA" formControlName="iva">
+                    <label for="iva">IVA</label>
+                </div>
+                <div class="floating-label checkbox-container">
+                    <input type="checkbox" id="ivaExento" formControlName="ivaExento">
+                    <label for="ivaExento">I.V.A Exento?</label>
+                </div>
+                <div class="floating-label">
+                    <label for="catValor">CAT: Valor</label>
+                </div>
+            </div>
+            <div class="text-center">
+            <button type="button" class="btn btn-success" style="margin-top: 20px;" (click)="simular()">Simular</button>
+            <button type="button" class="btn btn-warning" style="margin-top: 20px; margin-left: 10px; color: white;" (click)="limpiar()">Limpiar</button>
             </div>
         </div>
+    </form>
+</div>
+<div *ngIf="mostrarTabla" class="col-12 card shadow mb-4 p-3">
+<div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-line"></i> Tabla de amortización</h6>
+</div>
+<fieldset>
+    <div class="no-padding table-responsive table-hover" style="margin-top: 20px; font-size: 13px;">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center headerTable-top-left">Pago</th>
+                    <th class="text-center">Otorgamiento</th>
+                    <th class="text-center">Día de vencimiento</th>
+                    <th class="text-center">Días</th>
+                    <th class="text-center">Saldo Insoluto</th>
+                    <th class="text-center">Capital</th>
+                    <th class="text-center">Interés</th>
+                    <th class="text-center">IVA</th>
+                    <th class="text-center">Interés + IVA</th>
+                    <th class="text-center headerTable-top-right">Pago total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aqui debemos de poner los datos recibidos -->
+                <tr class="text-center">
+                    <td>1</td>
+                    <td>10/07/2024</td>
+                    <td>10/08/2024</td>
+                    <td>30</td>
+                    <td>$10,000</td>
+                    <td>$500</td>
+                    <td>$50</td>
+                    <td>$10</td>
+                    <td>$60</td>
+                    <td>$560</td>
+                </tr>
+                <tr class="text-center">
+                    <td>1</td>
+                    <td>10/07/2024</td>
+                    <td>10/08/2024</td>
+                    <td>30</td>
+                    <td>$10,000</td>
+                    <td>$500</td>
+                    <td>$50</td>
+                    <td>$10</td>
+                    <td>$60</td>
+                    <td>$560</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+</fieldset>
 </div>

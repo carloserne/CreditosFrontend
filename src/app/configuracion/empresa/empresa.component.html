@@ -1,69 +1,66 @@
-<app-sidebar></app-sidebar>
-<div class="content">
-    <h3 class="titulo">Empresas</h3>
-    <div class="col-12 card shadow mb-4 p-3">
-        <fieldset class="d-flex align-items-center justify-content-between">
-            <div class="alert alert-warning m-0" role="alert">
-                En este modulo tendra la capacidad de agregar, modificar y eliminar a las distintas empresas que se tengan como clientes.
-            </div>
-            <ul class="botonp m-0 d-flex">
-                <li class="icon-content">
-                    <a aria-label="Agregar" data-social="agregar" (click)="openModal('add')">
-                        <div class="filled"></div>
-                        <i class="fa fa-plus fa-lg"></i>
-                    </a>
-                    <div class="tooltip">Agregar</div>
-                </li>
-            </ul>
-        </fieldset>
-    </div>
-    <div class="card shadow mb-4 p-3" id="spacesTable">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold"><i class="fas fa-industry"></i>&nbsp;Listado de empresas</h6>
+<h3 class="titulo">Empresas</h3>
+<div class="col-12 card shadow mb-4 p-3">
+    <fieldset class="d-flex align-items-center justify-content-between">
+        <div class="alert alert-warning m-0" role="alert">
+            En este modulo tendra la capacidad de agregar, modificar y eliminar a las distintas empresas que se tengan como clientes.
         </div>
-        <fieldset>
-            <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
-                <table class="table table-bordered table-hover">
-                    <thead>
-                        <tr class="text-center">
-                            <th class="headerTable-top-left">Raz&oacute;n Social</th>
-                            <th>Representante</th>
-                            <th>RFC</th>
-                            <th>Estado</th>
-                            <th class="headerTable-top-right">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let o of empresas" class="text-center">
-                            <td>{{ o.razonSocial }}</td>
-                            <td>{{ o.nombreRepresentanteLegal }}</td>
-                            <td>{{ o.rfc }}</td>
-                            <td>{{ o.estado }}</td>
-                            <td class="d-flex align-items-center justify-content-center">
-                                <ul class="botonp list-unstyled m-0">
-                                    <li class="icon-content">
-                                        <a aria-label="Editar" data-social="editar" (click)="openModal('edit', o)">
-                                            <div class="filled"></div>
-                                            <i class="fas fa-pencil-alt fa-lg" aria-hidden="true"></i>
-                                        </a>
-                                        <div class="tooltip">Editar</div>
-                                    </li>
-                                    &nbsp;
-                                    <li class="icon-content">
-                                        <a aria-label="Eliminar" data-social="eliminar" (click)="eliminar(o)">
-                                            <div class="filled"></div>
-                                            <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
-                                        </a>
-                                        <div class="tooltip">Eliminar</div>
-                                    </li>
-                                </ul>
-                            </td>
-                        </tr>              
-                    </tbody>
-                </table>
-            </div>
-        </fieldset>
+        <ul class="botonp m-0 d-flex">
+            <li class="icon-content">
+                <a aria-label="Agregar" data-social="agregar" (click)="openModal('add')">
+                    <div class="filled"></div>
+                    <i class="fa fa-plus fa-lg"></i>
+                </a>
+                <div class="tooltip">Agregar</div>
+            </li>
+        </ul>
+    </fieldset>
+</div>
+<div class="card shadow mb-4 p-3" id="spacesTable">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold"><i class="fas fa-industry"></i>&nbsp;Listado de empresas</h6>
     </div>
+    <fieldset>
+        <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <th class="headerTable-top-left">Raz&oacute;n Social</th>
+                        <th>Representante</th>
+                        <th>RFC</th>
+                        <th>Estado</th>
+                        <th class="headerTable-top-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let o of empresas" class="text-center">
+                        <td>{{ o.razonSocial }}</td>
+                        <td>{{ o.nombreRepresentanteLegal }}</td>
+                        <td>{{ o.rfc }}</td>
+                        <td>{{ o.estado }}</td>
+                        <td class="d-flex align-items-center justify-content-center">
+                            <ul class="botonp list-unstyled m-0">
+                                <li class="icon-content">
+                                    <a aria-label="Editar" data-social="editar" (click)="openModal('edit', o)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-pencil-alt fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Editar</div>
+                                </li>
+                                &nbsp;
+                                <li class="icon-content">
+                                    <a aria-label="Eliminar" data-social="eliminar" (click)="eliminar(o)">
+                                        <div class="filled"></div>
+                                        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Eliminar</div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>              
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
 </div>
 
 <!-- Modal -->

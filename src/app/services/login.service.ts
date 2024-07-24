@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, of, tap, throwError } from 'rxjs';
 import { IUsuario } from '../interfaces/usuario';
-import { ToastrService } from 'ngx-toastr';
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +10,7 @@ export class LoginService {
     private apiUrl = 'https://localhost:5000/api/Usuario';
     private usuario: IUsuario | null = null;
 
-    constructor(private http: HttpClient, toastService: ToastrService) { }
+    constructor(private http: HttpClient) { }
 
     login(usuario: string, contrasenia: string): Observable<any> {
         const headers = new HttpHeaders({

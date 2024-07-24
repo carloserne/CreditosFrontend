@@ -34,15 +34,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="text-center">
-                            <td>1</td>
-                            <td>10/07/2024</td>
-                            <td>10/08/2024</td>
-                            <td>30</td>
+                        <tr *ngFor="let o of empresas" class="text-center">
+                            <td>{{ o.razonSocial }}</td>
+                            <td>{{ o.nombreRepresentanteLegal }}</td>
+                            <td>{{ o.rfc }}</td>
+                            <td>{{ o.estado }}</td>
                             <td class="d-flex align-items-center justify-content-center">
                                 <ul class="botonp list-unstyled m-0">
                                     <li class="icon-content">
-                                        <a aria-label="Editar" data-social="editar" (click)="openModal('edit')">
+                                        <a aria-label="Editar" data-social="editar" (click)="openModal('edit', o)">
                                             <div class="filled"></div>
                                             <i class="fas fa-pencil-alt fa-lg" aria-hidden="true"></i>
                                         </a>
@@ -58,7 +58,7 @@
                                     </li>
                                 </ul>
                             </td>
-                        </tr>
+                        </tr>              
                     </tbody>
                 </table>
             </div>
@@ -75,29 +75,90 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="container">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Método" id="metodo">
+                <form [formGroup]="empresaForm">
+                    <div class="inputs-container mt-4">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="razonSocial" placeholder="Razón Social" formControlName="razonSocial">
+                            <label for="razonSocial">Raz&oacute;n Social</label>
                         </div>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Plazo" id="plazo">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="fechaConstitucion" placeholder="Fecha Constitución" formControlName="fechaConstitucion">
+                            <label for="fechaConstitucion">Fecha Constitución</label>
                         </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Tasa" id="tasa">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="numeroEscritura" placeholder="No. Escritura" formControlName="numeroEscritura">
+                            <label for="numeroEscritura">No. Escritura</label>
                         </div>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="Interés" id="interes">
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" placeholder="IVA" id="iva">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="nombreNotario" placeholder="Nombre Notario" formControlName="nombreNotario">
+                            <label for="nombreNotario">Nombre Notario</label>
                         </div>
                     </div>
-                </div> 
+                    <div class="inputs-container mt-4">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="folioMercantil" placeholder="Folio Mercantil" formControlName="folioMercantil">
+                            <label for="folioMercantil">Folio Mercantil</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="rfc" placeholder="Rfc" formControlName="rfc">
+                            <label for="rfc">RFC</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="nombreRepresentanteLegal" placeholder="Nombre Rep. Legal" formControlName="nombreRepresentanteLegal">
+                            <label for="nombreRepresentanteLegal">Nombre Rep. Legal</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="numeroEscrituraRepLeg" placeholder="No. Escritura Rep Leg" formControlName="numeroEscrituraRepLeg">
+                            <label for="numeroEscrituraRepLeg">No. Escritura Rep Leg</label>
+                        </div>
+                    </div>
+                    <div class="inputs-container mt-4">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="fechaInscripcion" placeholder="Fecha Inscripción" formControlName="fechaInscripcion">
+                            <label for="fechaInscripcion">Fecha Inscripción</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="calle" placeholder="Calle" formControlName="calle">
+                            <label for="calle">Calle</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="colonia" placeholder="Colonia" formControlName="colonia">
+                            <label for="colonia">Colonia</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="cp" placeholder="Código Postal" formControlName="cp">
+                            <label for="cp">Código Postal</label>
+                        </div>
+                    </div>
+                    <div class="inputs-container mt-4">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="telefono" placeholder="Teléfono" formControlName="telefono">
+                            <label for="telefono">Teléfono</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="estado" placeholder="Estado" formControlName="estado">
+                            <label for="estado">Estado</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="localidad" placeholder="Localidad" formControlName="localidad">
+                            <label for="localidad">Localidad</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="numExterior" placeholder="Num. Exterior" formControlName="numExterior">
+                            <label for="numExterior">Num. Exterior</label>
+                        </div>
+                    </div>
+                    <div class="inputs-container mt-4">
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="numInterior" placeholder="Num. Interior" formControlName="numInterior">
+                            <label for="numInterior">Num. Interior</label>
+                        </div>
+                        <div class="floating-label">
+                            <input type="text" class="inputM" id="email" placeholder="Email" formControlName="email">
+                            <label for="email">Email</label>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

@@ -28,6 +28,48 @@ export class EmpresasService {
         );
     }
 
+    guardarEmpresa(empresa: IEmpresa): Observable<IEmpresa> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return throwError(() => new Error('No token found'));
+        }
+
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        });
+
+        return this.http.post<IEmpresa>(this.apiUrl, empresa, { headers })
+            .pipe(
+                catchError(error => {
+                console.error('Error saving company:', error);
+                return throwError(() => new Error('Error saving company'));
+                })
+            );
+    }
+
+    actualizarEmpresa(empresa: IEmpresa): Observable<IEmpresa> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return throwError(() => new Error('No token found'));
+        }
+    
+        return this.http.put<IEmpresa>(`${this.apiUrl}/${empresa.idEmpresa}`, empresa, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).pipe(
+        catchError(error => {
+            console.error('Error al actualizar la empresa', error);
+            return throwError(() => new Error('Error al actualizar la empresa'));
+        })
+        );
+    }
+
+    eliminarEmpresa(id: number): Observable<void> {
+        return this.http.put<void>(`${this.apiUrl}/${id}/eliminar`, null);
+    }
+
     private handleError(error: any): Observable<never> {
         const errorMessage = `Error: ${error.status} - ${error.message}`;
         console.error('Ocurrió un error:', errorMessage);

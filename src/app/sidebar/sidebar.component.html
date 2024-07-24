@@ -16,16 +16,16 @@
     <div class="menu-item" (click)="toggleMenu('settings')">
         <i class="fas fa-cogs"></i> Configuración
         <div *ngIf="expandedMenu === 'settings'" class="submenu">
-            <p class="submenu-item" (click)="navigateTo('/configuracion/empresa')"><i class="fas fa-industry"></i> Empresa</p>
+            <p class="submenu-item" (click)="navigateTo('/configuracion/empresas')"><i class="fas fa-industry"></i> Empresa</p>
             <p class="submenu-item" (click)="navigateTo('/configuracion/usuarios')"><i class="fas fa-users"></i> Usuarios</p>
             <p class="submenu-item" (click)="navigateTo('/configuracion/clientes')"><i class="fas fa-handshake"></i> Clientes</p>
         </div>
     </div>
     <div class="user-section">
         <div class="user-info">
-            <img src="/assets/images/user.jpg" alt="User" class="user-image">
-            <span class="user-name">Usuario</span>
-        </div>
+            <img [src]="getImageUrl(usuario?.imagen)" alt="User" class="user-image">
+            <span class="user-name">{{ usuario?.nombre }}</span>
+        </div>        
         <button (click)="logout()" class="logout-button">
             <i class="fas fa-sign-out-alt"></i>Cerrar sesión
         </button>

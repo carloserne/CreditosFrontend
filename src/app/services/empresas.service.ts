@@ -66,8 +66,22 @@ export class EmpresasService {
         );
     }
 
-    eliminarEmpresa(id: number): Observable<void> {
-        return this.http.put<void>(`${this.apiUrl}/${id}/eliminar`, null);
+    eliminarEmpresa(id: number | null): Observable<void> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return throwError(() => new Error('No token found'));
+        }
+
+        return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).pipe(
+            catchError(error => {
+                console.error('Error al eliminar la empresa', error);
+                return throwError(() => new Error('Error al eliminar la empresa'));
+            })
+        );
     }
 
     private handleError(error: any): Observable<never> {

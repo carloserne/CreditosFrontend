@@ -64,11 +64,11 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header d-flex justify-content-center position-relative">
-                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">Modal title</h1>
+                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
                 <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -76,23 +76,31 @@
                     <form [formGroup]="empresaForm" novalidate (ngSubmit)="guardar()">
                         <div class="inputs-container mt-4">
                             <div class="floating-label">
+                                <input type="text" class="inputM" id="nombreEmpresa" placeholder="Nombre Empresa" formControlName="nombreEmpresa">
+                                <label for="nombreEmpresa">Nombre Empresa</label>
+                            </div>
+                            <div class="floating-label">
                                 <input type="text" class="inputM" id="razonSocial" placeholder="Razón Social" formControlName="razonSocial">
                                 <label for="razonSocial">Raz&oacute;n Social</label>
                             </div>
                             <div class="floating-label">
-                                <input type="text" class="inputM" id="fechaConstitucion" placeholder="Fecha Constitución" formControlName="fechaConstitucion">
+                                <input type="date" class="inputM" id="fechaConstitucion" placeholder="Fecha Constitución" formControlName="fechaConstitucion">
                                 <label for="fechaConstitucion">Fecha Constitución</label>
                             </div>
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="numeroEscritura" placeholder="No. Escritura" formControlName="numeroEscritura">
                                 <label for="numeroEscritura">No. Escritura</label>
                             </div>
+                        </div>
+                        <div class="inputs-container mt-4">
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="nombreNotario" placeholder="Nombre Notario" formControlName="nombreNotario">
                                 <label for="nombreNotario">Nombre Notario</label>
                             </div>
-                        </div>
-                        <div class="inputs-container mt-4">
+                            <div class="floating-label">
+                                <input type="text" class="inputM" id="numeroNotario" placeholder="Número Notario" formControlName="numeroNotario">
+                                <label for="numeroNotario">Número Notario</label>
+                            </div>
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="folioMercantil" placeholder="Folio Mercantil" formControlName="folioMercantil">
                                 <label for="folioMercantil">Folio Mercantil</label>
@@ -101,6 +109,8 @@
                                 <input type="text" class="inputM" id="rfc" placeholder="Rfc" formControlName="rfc">
                                 <label for="rfc">RFC</label>
                             </div>
+                        </div>
+                        <div class="inputs-container mt-4">
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="nombreRepresentanteLegal" placeholder="Nombre Rep. Legal" formControlName="nombreRepresentanteLegal">
                                 <label for="nombreRepresentanteLegal">Nombre Rep. Legal</label>
@@ -109,16 +119,16 @@
                                 <input type="text" class="inputM" id="numeroEscrituraRepLeg" placeholder="No. Escritura Rep Leg" formControlName="numeroEscrituraRepLeg">
                                 <label for="numeroEscrituraRepLeg">No. Escritura Rep Leg</label>
                             </div>
-                        </div>
-                        <div class="inputs-container mt-4">
                             <div class="floating-label">
-                                <input type="text" class="inputM" id="fechaInscripcion" placeholder="Fecha Inscripción" formControlName="fechaInscripcion">
+                                <input type="date" class="inputM" id="fechaInscripcion" placeholder="Fecha Inscripción" formControlName="fechaInscripcion">
                                 <label for="fechaInscripcion">Fecha Inscripción</label>
                             </div>
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="calle" placeholder="Calle" formControlName="calle">
                                 <label for="calle">Calle</label>
                             </div>
+                        </div>
+                        <div class="inputs-container mt-4">
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="colonia" placeholder="Colonia" formControlName="colonia">
                                 <label for="colonia">Colonia</label>
@@ -127,8 +137,6 @@
                                 <input type="text" class="inputM" id="cp" placeholder="Código Postal" formControlName="cp">
                                 <label for="cp">Código Postal</label>
                             </div>
-                        </div>
-                        <div class="inputs-container mt-4">
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="telefono" placeholder="Teléfono" formControlName="telefono">
                                 <label for="telefono">Teléfono</label>
@@ -137,6 +145,8 @@
                                 <input type="text" class="inputM" id="estado" placeholder="Estado" formControlName="estado">
                                 <label for="estado">Estado</label>
                             </div>
+                        </div>
+                        <div class="inputs-container mt-4">
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="localidad" placeholder="Localidad" formControlName="localidad">
                                 <label for="localidad">Localidad</label>
@@ -145,8 +155,6 @@
                                 <input type="text" class="inputM" id="numExterior" placeholder="Num. Exterior" formControlName="numExterior">
                                 <label for="numExterior">Num. Exterior</label>
                             </div>
-                        </div>
-                        <div class="inputs-container mt-4">
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="numInterior" placeholder="Num. Interior" formControlName="numInterior">
                                 <label for="numInterior">Num. Interior</label>
@@ -154,6 +162,12 @@
                             <div class="floating-label">
                                 <input type="text" class="inputM" id="email" placeholder="Email" formControlName="email">
                                 <label for="email">Email</label>
+                            </div>
+                        </div>
+                        <div class="inputs-container mt-4 text-center">
+                            <input #fileInput class="inputM" type="file" (change)="onFileSelected($event)" accept="image/jpeg, image/jpg, image/png" style="width: 40%;">
+                            <div id="imagePreview" *ngIf="selectedImage" class="image-preview mt-3">
+                                <img [src]="selectedImage" alt="Imagen seleccionada" style="height: 150px; width: 150px;">
                             </div>
                         </div>
                         <div class="modal-footer d-flex justify-content-center">

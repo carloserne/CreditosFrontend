@@ -1,5 +1,6 @@
 export interface IEmpresa {
-    idEmpresa: number;
+    idEmpresa: number | null;
+    nombreEmpresa: string;
     razonSocial: string;
     fechaConstitucion: string;
     numeroEscritura: string;

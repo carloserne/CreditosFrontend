@@ -1,32 +1,45 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit } from '@angular/core';
-import { SidebarComponent } from '../../sidebar/sidebar.component';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EmpresasService } from '../../services/empresas.service';
 import { ToastrService } from 'ngx-toastr';
 import { IEmpresa } from '../../interfaces/empresa';
+import { ViewChild } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 declare let Swal: any;
 
 @Component({
     selector: 'app-empresa',
     standalone: true,
-    imports: [CommonModule, SidebarComponent, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './empresa.component.html',
-    styleUrls: ['./empresa.component.scss']
+    styleUrls: ['./empresa.component.scss'],
+    providers: [NgbModal],
 })
 export class EmpresaComponent implements OnInit {
     modalTitle: string = '';
     empresaForm: FormGroup;
     empresas: IEmpresa[] = [];
+    selectedImage: string | ArrayBuffer | null = null;
+    modalRef: any;
+    @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
+    @ViewChild('modalElement', { static: false }) modalElement!: ElementRef;
 
-    constructor(private elementRef: ElementRef, private fb: FormBuilder, private empresasService: EmpresasService, private toastr: ToastrService) {
+    constructor(
+        private elementRef: ElementRef,
+        private fb: FormBuilder,
+        private empresasService: EmpresasService,
+        private toastr: ToastrService
+    ) {
         this.empresaForm = this.fb.group({
             idEmpresa: [0],
+            nombreEmpresa: ['', Validators.required],
             razonSocial: ['', Validators.required],
             fechaConstitucion: ['', Validators.required],
             numeroEscritura: ['', Validators.required],
             nombreNotario: ['', Validators.required],
+            numeroNotario: ['', Validators.required],
             folioMercantil: ['', Validators.required],
             rfc: ['', Validators.required],
             nombreRepresentanteLegal: ['', Validators.required],
@@ -41,12 +54,12 @@ export class EmpresaComponent implements OnInit {
             numExterior: ['', Validators.required],
             numInterior: [''],
             email: ['', Validators.required],
-            estatus: [1, Validators.required],
-            logo: ['']
+            estatus: [1],
+            logo: ['', Validators.required],
         });
     }
 
-    async ngOnInit() { 
+    async ngOnInit() {
         await this.obtenerEmpresas();
     }
 
@@ -55,13 +68,16 @@ export class EmpresaComponent implements OnInit {
 
         if (mode === 'add') {
             this.empresaForm.reset();
+            this.selectedImage = null;
         } else if (mode === 'edit' && empresa) {
             this.empresaForm.patchValue({
                 idEmpresa: empresa.idEmpresa,
+                nombreEmpresa: empresa.nombreEmpresa,
                 razonSocial: empresa.razonSocial,
                 fechaConstitucion: empresa.fechaConstitucion,
                 numeroEscritura: empresa.numeroEscritura,
                 nombreNotario: empresa.nombreNotario,
+                numeroNotario: empresa.numeroNotario,
                 folioMercantil: empresa.folioMercantil,
                 rfc: empresa.rfc,
                 nombreRepresentanteLegal: empresa.nombreRepresentanteLegal,
@@ -76,14 +92,10 @@ export class EmpresaComponent implements OnInit {
                 numExterior: empresa.numExterior,
                 numInterior: empresa.numInterior,
                 email: empresa.email,
-                estatus: empresa.estatus
-                //Falta el logo
+                estatus: empresa.estatus,
+                logo: empresa.logo
             });
-        }
-    
-        const modalTitleElement = this.elementRef.nativeElement.querySelector('#staticBackdropLabel');
-        if (modalTitleElement) {
-            modalTitleElement.textContent = this.modalTitle;
+            this.selectedImage = empresa.logo ?? null;
         }
 
         const modalElement = this.elementRef.nativeElement.querySelector('#staticBackdrop');
@@ -96,9 +108,29 @@ export class EmpresaComponent implements OnInit {
         }
     }
 
+    closeModal() {
+        const modalElement = this.elementRef.nativeElement.querySelector('#staticBackdrop');
+        if (modalElement) {
+            const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+        this.onModalClose();
+    }
+
+    onModalClose() {
+        this.empresaForm.reset();
+        this.selectedImage = null;
+
+        if (this.fileInput) {
+            (this.fileInput.nativeElement as HTMLInputElement).value = '';
+        }
+    }
+
     obtenerEmpresas() {
         this.empresasService.getEmpresas().subscribe(
-            (data: IEmpresa[]) => {
+            (data: any[]) => {
                 this.empresas = data;
             },
             (error) => {
@@ -108,17 +140,33 @@ export class EmpresaComponent implements OnInit {
     }
 
     guardar(): void {
-        if (this.empresaForm.invalid) {
-            this.toastr.warning('Debe llenar todos los campos.');
+        if (this.empresaForm.invalid || !this.selectedImage) {
+            this.toastr.warning('Debe llenar todos los campos y seleccionar una imagen.');
             return;
         }
 
-        const empresa: IEmpresa = this.empresaForm.value;
+        const formatDate = (date: Date): string => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        let empresa: IEmpresa = this.empresaForm.value;
+
+        const fechaConstitucionDate = new Date(empresa.fechaConstitucion);
+        const fechaInscripcionDate = new Date(empresa.fechaInscripcion);
+
+        empresa.fechaConstitucion = formatDate(fechaConstitucionDate);
+        empresa.fechaInscripcion = formatDate(fechaInscripcionDate);
+        empresa.estatus = 1;
+        empresa.logo = this.selectedImage as string;
 
         if (empresa.idEmpresa) {
             this.empresasService.actualizarEmpresa(empresa).subscribe({
                 next: (response) => {
                     this.toastr.success('Empresa actualizada con éxito.', "Actualizado");
+                    this.closeModal();
                     this.obtenerEmpresas();
                 },
                 error: (error) => {
@@ -126,9 +174,11 @@ export class EmpresaComponent implements OnInit {
                 }
             });
         } else {
+            empresa.idEmpresa = 0;
             this.empresasService.guardarEmpresa(empresa).subscribe({
                 next: (response) => {
                     this.toastr.success('Empresa guardada con éxito.', "Guardado");
+                    this.closeModal();
                     this.obtenerEmpresas();
                 },
                 error: (error) => {
@@ -139,7 +189,6 @@ export class EmpresaComponent implements OnInit {
     }
 
     async eliminar(empresa: IEmpresa) {
-        console.log(empresa);
         const result = await Swal.fire({
             title: '¿Eliminar empresa?',
             text: "¿Estás seguro de eliminar esta empresa?",
@@ -162,5 +211,20 @@ export class EmpresaComponent implements OnInit {
                 }
             });
         }
+    }
+
+    onFileSelected(event: any) {
+        const file: File = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.selectedImage = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    handleReaderLoaded(e: any) {
+        this.selectedImage = e.target.result;
     }
 }

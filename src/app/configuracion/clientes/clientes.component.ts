@@ -132,14 +132,14 @@ export class ClientesComponent implements OnInit {
         if (regimenFiscal === 'FISICA') {
             // Validar campos de persona física y vaciar datos morales
             if (!this.validateDatosClienteFisicas()) {
-                this.toastr.error('Por favor, complete todos los campos obligatorios de Persona Física.', 'Formulario inválido');
+                this.toastr.warning('Por favor, complete todos los campos obligatorios de Persona Física.', 'Formulario inválido');
                 return;
             }
             clienteData.datosClienteMorals = [];
         } else if (regimenFiscal === 'MORAL') {
             // Validar campos de persona moral y vaciar datos físicos
             if (!this.validateDatosClienteMorals()) {
-                this.toastr.error('Por favor, complete todos los campos obligatorios de Persona Moral.', 'Formulario inválido');
+                this.toastr.warning('Por favor, complete todos los campos obligatorios de Persona Moral.', 'Formulario inválido');
                 return;
             }
             clienteData.datosClienteFisicas = [];

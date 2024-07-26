@@ -13,6 +13,13 @@
             <p class="submenu-item" (click)="navigateTo('/simulador')"><i class="fas fa-calculator"></i> Simular Crédito</p>
         </div>
     </div>
+    <div class="menu-item" (click)="toggleMenu('expedientes')">
+        <i class="fa fa-folder"></i>Expedientes
+        <div *ngIf="expandedMenu === 'expedientes'" class="submenu">
+            <p class="submenu-item" (click)="navigateTo('/expedientes/documentos')"><i class="fa fa-file"></i> Documentos</p>
+            <p class="submenu-item" (click)="navigateTo('/expedientes/documentos')"><i class="fa fa-archive"></i> Documentos Usuario</p>
+        </div>
+    </div>
     <div class="menu-item" (click)="toggleMenu('settings')">
         <i class="fas fa-cogs"></i> Configuración
         <div *ngIf="expandedMenu === 'settings'" class="submenu">

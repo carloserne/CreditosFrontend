@@ -1,0 +1,98 @@
+<h3 class="titulo">Documentos</h3>
+<div class="col-12 card shadow mb-4 p-3">
+    <fieldset class="d-flex align-items-center justify-content-between">
+        <div class="alert alert-warning m-0" role="alert">
+            En este modulo tendra la capacidad de agregar, modificar y eliminar los tipos de documentos que necesitan los clientes.
+        </div>
+        <ul class="botonp m-0 d-flex">
+            <li class="icon-content">
+                <a aria-label="Agregar" data-social="agregar" (click)="openModal('add')">
+                    <div class="filled"></div>
+                    <i class="fa fa-plus fa-lg"></i>
+                </a>
+                <div class="tooltip">Agregar</div>
+            </li>
+        </ul>
+    </fieldset>
+</div>
+<div class="card shadow mb-4 p-3" id="spacesTable">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold"><i class="fa fa-folder"></i>&nbsp;Listado de documentos</h6>
+    </div>
+    <fieldset>
+        <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <th class="headerTable-top-left">Nombre</th>
+                        <th>Tipo</th>
+                        <th>Id Empresa</th>
+                        <th class="headerTable-top-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let o of documentos" class="text-center">
+                        <td>{{ o.nombre }}</td>
+                        <td>{{ o.tipo }}</td>
+                        <td>{{ o.idEmpresa }}</td>
+                        <td class="d-flex align-items-center justify-content-center">
+                            <ul class="botonp list-unstyled m-0">
+                                <li class="icon-content">
+                                    <a aria-label="Editar" data-social="editar" (click)="openModal('edit', o)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-pencil-alt fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Editar</div>
+                                </li>
+                                &nbsp;
+                                <li class="icon-content">
+                                    <a aria-label="Eliminar" data-social="eliminar" (click)="eliminar(o)">
+                                        <div class="filled"></div>
+                                        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Eliminar</div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <form [formGroup]="documentoForm" novalidate (ngSubmit)="guardar()">
+                        <div class="inputs-container mt-4">
+                            <div class="floating-label">
+                                <input type="text" class="inputM" id="nombre" placeholder="Nombre" formControlName="nombre">
+                                <label for="nombre">Nombre</label>
+                            </div>
+                            <div class="floating-label">
+                                <select class="inputM" id="tipo" formControlName="tipo">
+                                    <option value="" disabled selected>Selecciona un tipo</option>
+                                    <option value="FISICA">FISICA</option>
+                                    <option value="MORAL">MORAL</option>
+                                </select>
+                                <label for="tipo">Tipo</label>
+                            </div>                            
+                        </div>
+                        <div class="modal-footer d-flex justify-content-center mt-4">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-success" (click)="guardar()">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -50,6 +50,7 @@ export class ClientesComponent implements OnInit {
         this.clientesService.getClientes().subscribe({
             next: (data: ICliente[]) => {
                 this.clientes = data;
+                console.log(this.clientes);
             },
             error: (error) => {
                 this.toastr.error('Error al obtener la lista de clientes', 'Error');

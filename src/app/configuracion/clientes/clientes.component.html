@@ -32,7 +32,19 @@
                 <tbody>
                     <tr *ngFor="let o of clientes" class="text-center">
                         <td>{{o.regimenFiscal}}</td>
-                        <td>{{o.idEmpresa}}</td>
+                        <td>
+                            <ng-container *ngIf="o.regimenFiscal === 'MORAL'; else personaFisica">
+                                {{(o.datosClienteMorals && o.datosClienteMorals.length > 0) ? (o.datosClienteMorals[0].nombreRepLegal || 'N/A') : 'N/A'}}
+                            </ng-container>
+                            <ng-template #personaFisica>
+                                {{(o.datosClienteFisicas && o.datosClienteFisicas.length > 0 
+                                    && o.datosClienteFisicas[0].idPersonaNavigation 
+                                    ? (o.datosClienteFisicas[0].idPersonaNavigation.nombre + ' ' 
+                                        + o.datosClienteFisicas[0].idPersonaNavigation.apellidoPaterno + ' ' 
+                                        + o.datosClienteFisicas[0].idPersonaNavigation.apellidoMaterno) 
+                                    : 'N/A')}}
+                            </ng-template>
+                        </td>
                         <td class="d-flex align-items-center justify-content-center">
                             <ul class="botonp list-unstyled m-0">
                                 <li class="icon-content">

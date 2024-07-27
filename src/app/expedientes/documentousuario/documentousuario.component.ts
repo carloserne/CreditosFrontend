@@ -141,15 +141,22 @@ export class DocumentousuarioComponent implements OnInit {
     }
 
     onModalClose(): void {
+        console.log('Cerrando modal, limpiando campos...');
         this.documentoCForm.reset();
         this.selectedDocumento = null;
         this.selectedFileName = {};
         this.documentoBase64 = '';
+        this.fileInput.nativeElement.value = ''; // Limpia el input file
     }
 
     guardar(): void {
         if (!this.selectedDocumento) {
             this.toastr.error('Seleccione un documento para subir.', 'Error');
+            return;
+        }
+
+        if (!this.documentoBase64) {
+            this.toastr.error('Seleccione un archivo para subir.', 'Error');
             return;
         }
 
@@ -159,15 +166,17 @@ export class DocumentousuarioComponent implements OnInit {
             estatus: 1,
         };
 
-        this.documentPorClienteService.guardarDocumento(nuevoDocumento).subscribe({
-            next: () => {
-                this.toastr.success('Documento guardado exitosamente.', 'Éxito');
-                this.onModalClose();
-            },
-            error: () => {
-                this.toastr.error('No se pudo guardar el documento. Inténtelo de nuevo más tarde.', 'Error');
-            }
-        });
+        console.log(nuevoDocumento);
+
+        // this.documentPorClienteService.guardarDocumento(nuevoDocumento).subscribe({
+        //     next: () => {
+        //         this.toastr.success('Documento guardado exitosamente.', 'Éxito');
+        //         this.onModalClose();
+        //     },
+        //     error: () => {
+        //         this.toastr.error('No se pudo guardar el documento. Inténtelo de nuevo más tarde.', 'Error');
+        //     }
+        // });
     }
 
     onDocumentoSelect(event: Event): void {

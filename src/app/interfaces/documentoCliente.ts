@@ -3,5 +3,6 @@ export interface ICDocumentoCliente {
     idDocumento: number;
     idCliente: number;
     DocumentoBase64: string;
-    Estatus: number;
+    estatus: number;
+    estatusSeguimiento?: number;
 }

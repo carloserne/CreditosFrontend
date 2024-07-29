@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ClientesService } from '../../services/clientes.service';
 import { DocumentosService } from '../../services/documentos.service';
@@ -8,6 +8,7 @@ import { ICliente } from '../../interfaces/cliente';
 import { IDocumento } from '../../interfaces/documentos';
 import { CommonModule } from '@angular/common';
 import { INuevoDocumento } from '../../services/nuevoDocumento';
+import { ICDocumentoCliente } from '../../interfaces/documentoCliente';
 
 @Component({
     selector: 'app-documentousuario',
@@ -21,15 +22,19 @@ export class DocumentousuarioComponent implements OnInit {
     clienteNombre: string = ''; 
     clienteTipo: string = '';
     documentoCForm: FormGroup;
+    documentosAsignarForm: FormGroup;
     clientes: ICliente[] = [];
     documentos: IDocumento[] = [];
     documentosCliente: any[] = [];
     documentosFaltantes: IDocumento[] = [];
     documentosSubidos: any[] = [];
+    documentosMostrar: ICDocumentoCliente[] = [];
+    documentosFiltrados: IDocumento[] = [];
     selectedFileName: { [key: number]: string } = {};
     idClienteSeleccionado: number = 0;
     selectedDocumento: IDocumento | null = null;
     documentoBase64: string = '';
+    documentosModalForm: FormGroup;
 
     @ViewChild('fileInput') fileInput!: ElementRef;
 
@@ -45,11 +50,29 @@ export class DocumentousuarioComponent implements OnInit {
             idDocumento: [0],
             idCliente: [1]
         });
+
+        this.documentosAsignarForm = this.fb.group({});
+        this.documentosModalForm = this.fb.group({});
     }
 
     ngOnInit(): void {
         this.obtenerClientes();
         this.obtenerDocumentos();
+    }
+
+    obtenerDocumentosCliente(idCliente: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.documentPorClienteService.getDocumentosCliente(idCliente).subscribe(
+                (data: ICDocumentoCliente[]) => {
+                    this.documentosCliente = data;
+                    resolve();
+                },
+                (error) => {
+                    this.toastr.error('No se pudieron obtener los documentos. Inténtelo de nuevo más tarde.', 'Error');
+                    reject(error);
+                }
+            );
+        });
     }
 
     obtenerClientes(): void {
@@ -74,41 +97,7 @@ export class DocumentousuarioComponent implements OnInit {
         );
     }
 
-    obtenerDocumentosPorCliente(idCliente: number, regimenFiscal: string): void {
-        this.documentPorClienteService.getDocumentosCliente(idCliente).subscribe({
-            next: (data: any[]) => {
-                this.documentosCliente = data;
-                this.categorizarDocumentos(regimenFiscal);
-            },
-            error: (error) => {
-                this.toastr.error('No se pudieron obtener los documentos del cliente. Inténtelo de nuevo más tarde.', 'Error');
-            }
-        });
-    }
-
-    categorizarDocumentos(regimenFiscal: string): void {
-        this.documentosFaltantes = [];
-        this.documentosSubidos = [];
-    
-        const documentosFiltrados = this.documentos.filter(doc => doc.tipo === regimenFiscal);
-    
-        documentosFiltrados.forEach(doc => {
-            const clienteDoc = this.documentosCliente.find(d => d.idDocumento === doc.idCatalogoDocumento);
-            if (clienteDoc && clienteDoc.documentoBase64) {
-                this.documentosSubidos.push({
-                    ...doc,
-                    documentoBase64: clienteDoc.documentoBase64
-                });
-            } else {
-                this.documentosFaltantes.push(doc);
-            }
-        });
-    }
-
     openDocumentosModal(idCliente: number, regimenFiscal: string): void {
-        this.idClienteSeleccionado = idCliente;
-        this.obtenerDocumentosPorCliente(idCliente, regimenFiscal);
-
         const cliente = this.clientes.find(c => c.idCliente === idCliente);
         if (cliente) {
             if (regimenFiscal === 'MORAL') {
@@ -128,99 +117,194 @@ export class DocumentousuarioComponent implements OnInit {
             }
         }
 
+        this.idClienteSeleccionado = idCliente;
+
+        this.documentPorClienteService.getDocumentosAsignados(idCliente).subscribe({
+            next: (documentosAsignados) => {
+                // Crear un mapa de documentos asignados para referencia rápida
+                const documentosAsignadosMap = new Map<number, any>();
+                documentosAsignados.forEach(doc => {
+                    documentosAsignadosMap.set(doc.idDocumento, doc);
+                });
+
+                // Filtrar documentos que están en documentosAsignados y agregar estatusSeguimiento
+                const documentosAsignadosIds = Array.from(documentosAsignadosMap.keys());
+                const filtrar = this.documentos
+                    .filter(doc => doc.tipo === regimenFiscal && documentosAsignadosIds.includes(doc.idCatalogoDocumento))
+                    .map(doc => {
+                        const asignado = documentosAsignadosMap.get(doc.idCatalogoDocumento);
+                        return {
+                            ...doc,
+                            estatusSeguimiento: asignado ? asignado.estatus : 0,
+                            documentoBase64: asignado ? asignado.documentoBase64 : ''
+                        };
+                    });
+
+                this.documentosFaltantes = filtrar.filter(doc => doc.estatusSeguimiento === 4);
+                this.documentosSubidos = filtrar.filter(doc => doc.estatusSeguimiento !== 4);
+                console.log(this.documentosFaltantes);
+                console.log(this.documentosSubidos);
+
+                // Mostrar el modal
+                const modalElement = this.elementRef.nativeElement.querySelector('#documentosModal');
+                if (modalElement) {
+                    const modalInstance = new (window as any).bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modalInstance.show();
+                }
+            },
+            error: (error) => {
+                console.error('Error al obtener los documentos del cliente:', error);
+                this.toastr.error('No se pudo obtener los documentos. Inténtelo de nuevo más tarde.', 'Error');
+            }
+        });
         this.modalTitle = `Documentos del Cliente: ${this.clienteNombre} (${this.clienteTipo})`;
-
-        const modalElement = this.elementRef.nativeElement.querySelector('#documentosModal');
-        if (modalElement) {
-            const modalInstance = new (window as any).bootstrap.Modal(modalElement, {
-                backdrop: 'static',
-                keyboard: false
-            });
-            modalInstance.show();
-        }
     }
 
-    onModalClose(): void {
-        console.log('Cerrando modal, limpiando campos...');
-        this.documentoCForm.reset();
-        this.selectedDocumento = null;
-        this.selectedFileName = {};
-        this.documentoBase64 = '';
-        this.fileInput.nativeElement.value = ''; // Limpia el input file
-    }
-
-    guardar(): void {
+    async guardarDocumento(): Promise<void> {
         if (!this.selectedDocumento) {
-            this.toastr.error('Seleccione un documento para subir.', 'Error');
+            this.toastr.warning('Debe seleccionar un documento.', 'Advertencia');
             return;
         }
 
         if (!this.documentoBase64) {
-            this.toastr.error('Seleccione un archivo para subir.', 'Error');
+            this.toastr.warning('Debe seleccionar un archivo para subir.', 'Advertencia');
             return;
         }
 
-        const nuevoDocumento: INuevoDocumento = {
-            idDocumentoCliente: this.selectedDocumento.idCatalogoDocumento,
-            documentoBase64: this.documentoBase64,
-            estatus: 1,
-        };
+        try {
+            await this.obtenerDocumentosCliente(this.idClienteSeleccionado);
+            console.log(this.documentosCliente);
 
-        console.log(nuevoDocumento);
+            const documentoExistente = this.documentosCliente.find(doc => doc.idDocumento === this.selectedDocumento?.idCatalogoDocumento);
 
-        // this.documentPorClienteService.guardarDocumento(nuevoDocumento).subscribe({
-        //     next: () => {
-        //         this.toastr.success('Documento guardado exitosamente.', 'Éxito');
-        //         this.onModalClose();
-        //     },
-        //     error: () => {
-        //         this.toastr.error('No se pudo guardar el documento. Inténtelo de nuevo más tarde.', 'Error');
-        //     }
-        // });
+            if (!documentoExistente) {
+                this.toastr.error('El documento seleccionado no es válido.', 'Error');
+                return;
+            }
+
+            const data = {
+                idDocumentoCliente: documentoExistente.idDocumentoCliente,
+                documentoBase64: this.documentoBase64,
+                estatus: 3
+            };
+
+            // Llamar a guardarDocumento en el servicio
+            this.documentPorClienteService.guardarDocumento(data).subscribe({
+                next: (response) => {
+                    this.toastr.success('Documento guardado exitosamente.', 'Éxito');
+                    // Cerrar el modal
+                    const modalElement = this.elementRef.nativeElement.querySelector('#documentosModal');
+                    if (modalElement) {
+                        const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide();
+                    }
+                    // Limpiar selección
+                    this.onModalClose();
+                },
+                error: (error) => {
+                    console.error('Error al guardar el documento:', error);
+                    this.toastr.error('No se pudo guardar el documento. Inténtelo de nuevo más tarde.', 'Error');
+                }
+            });
+        } catch (error) {
+            console.error('Error al obtener los documentos del cliente:', error);
+        }
+    }
+
+    onModalClose(): void {
+        this.documentoCForm.reset();
+        this.documentosFiltrados = [];
+        this.selectedDocumento = null;
+        this.selectedFileName = {};
+        this.documentoBase64 = '';
+        this.fileInput.nativeElement.value = '';
     }
 
     onDocumentoSelect(event: Event): void {
         const selectElement = event.target as HTMLSelectElement;
-        const selectedValue = selectElement.value;
+        const selectedId = +selectElement.value;
 
-        if (selectedValue) {
-            const selectedDoc = this.documentosFaltantes.find(doc => doc.idCatalogoDocumento === parseInt(selectedValue, 10));
-            if (selectedDoc) {
-                this.selectedDocumento = selectedDoc;
-            } else {
-                this.selectedDocumento = null;
-            }
-        } else {
-            this.selectedDocumento = null;
-        }
+        this.selectedDocumento = this.documentosFaltantes.find(doc => doc.idCatalogoDocumento === selectedId) || null;
     }
 
-    handleFileInputClick(): void {
-        this.fileInput.nativeElement.click();
-    }
-
-    onFileChange(event: Event): void {
+    onFileSelect(event: Event): void {
         const input = event.target as HTMLInputElement;
-        if (input.files && input.files.length > 0) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = (e: any) => {
-                const base64 = e.target.result.split(',')[1];
-                if (this.selectedDocumento) {
-                    this.selectedFileName[this.selectedDocumento.idCatalogoDocumento] = file.name;
-                    this.documentoBase64 = base64;
-                }
-            };
-            reader.readAsDataURL(file);
+        const file = input.files?.[0];
+
+        if (!file) {
+            return;
         }
+
+        this.selectedFileName[this.selectedDocumento?.idCatalogoDocumento || 0] = file.name;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            this.documentoBase64 = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    openAsignarDocumentosModal(idCliente: number, regimenFiscal: string): void {
+        const cliente = this.clientes.find(c => c.idCliente === idCliente);
+        if (cliente) {
+            if (regimenFiscal === 'MORAL') {
+                this.clienteNombre = cliente.datosClienteMorals && cliente.datosClienteMorals.length > 0
+                    ? cliente.datosClienteMorals[0].nombreRepLegal || 'N/A'
+                    : 'N/A';
+                this.clienteTipo = 'Moral';
+            } else {
+                this.clienteNombre = cliente.datosClienteFisicas && cliente.datosClienteFisicas.length > 0
+                    ? cliente.datosClienteFisicas[0].idPersonaNavigation
+                        ? (cliente.datosClienteFisicas[0].idPersonaNavigation.nombre + ' '
+                            + cliente.datosClienteFisicas[0].idPersonaNavigation.apellidoPaterno + ' '
+                            + cliente.datosClienteFisicas[0].idPersonaNavigation.apellidoMaterno)
+                        : 'N/A'
+                    : 'N/A';
+                this.clienteTipo = 'Física';
+            }
+        }
+
+        this.idClienteSeleccionado = idCliente;
+
+        this.documentPorClienteService.getDocumentosAsignados(idCliente).subscribe({
+            next: (documentosAsignados) => {
+                const documentosAsignadosIds = documentosAsignados.map(doc => doc.idDocumento);
+
+                this.documentosFiltrados = this.documentos
+                    .filter(doc => doc.tipo === regimenFiscal)
+                    .filter(doc => !documentosAsignadosIds.includes(doc.idCatalogoDocumento)); 
+
+                this.documentosAsignarForm = this.fb.group({});
+
+                this.documentosFiltrados.forEach(documento => {
+                    this.documentosAsignarForm.addControl(documento.idCatalogoDocumento.toString(), new FormControl(false));
+                });
+
+                const modalElement = this.elementRef.nativeElement.querySelector('#asignarModal');
+                if (modalElement) {
+                    const modalInstance = new (window as any).bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modalInstance.show();
+                }
+            },
+            error: (error) => {
+                console.error('Error al obtener documentos asignados:', error);
+                this.toastr.error('No se pudo obtener la lista de documentos asignados. Inténtelo de nuevo más tarde.', 'Error');
+            }
+        });
+        this.modalTitle = `Asignar documentos a: ${this.clienteNombre} (${this.clienteTipo})`;
     }
 
     verDocumento(base64: string): void {
-        // Eliminar el prefijo 'data:application/pdf;base64,' si está presente
         if (base64.startsWith('data:application/pdf;base64,')) {
             base64 = base64.replace('data:application/pdf;base64,', '');
         }
-    
+
         try {
             const byteCharacters = atob(base64);
             const byteNumbers = new Array(byteCharacters.length);
@@ -234,6 +318,60 @@ export class DocumentousuarioComponent implements OnInit {
         } catch (error) {
             console.error('Failed to open PDF:', error);
             this.toastr.error('No se pudo abrir el documento PDF. Inténtelo de nuevo más tarde.', 'Error');
+        }
+    }
+
+    onModalCloseAsignar(): void {
+        this.documentosFiltrados = [];
+        this.documentosAsignarForm.reset
+    }
+
+    guardarAsignacionDocumentos(): void {
+        const selectedDocumentosIds = this.documentosFiltrados
+            .filter(documento => this.documentosAsignarForm.get(documento.idCatalogoDocumento.toString())?.value)
+            .map(documento => documento.idCatalogoDocumento);
+
+        if (selectedDocumentosIds.length === 0) {
+            this.toastr.warning('Debe seleccionar al menos un archivo.', 'Advertencia');
+            return;
+        }
+
+        const data = {
+            idCliente: this.idClienteSeleccionado,
+            idsDocumentos: selectedDocumentosIds
+        };
+
+        this.documentPorClienteService.guardarAsignacion(this.idClienteSeleccionado, selectedDocumentosIds).subscribe({
+            next: (response) => {
+                this.toastr.success('Asignación guardada exitosamente.', 'Éxito');
+                const modalElement = this.elementRef.nativeElement.querySelector('#asignarModal');
+                if (modalElement) {
+                    const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                }
+                this.documentosFaltantes = this.documentos.filter(documento => 
+                    !selectedDocumentosIds.includes(documento.idCatalogoDocumento)
+                );
+            },
+            error: (error) => {
+                console.error('Error al guardar la asignación:', error);
+                this.toastr.error('No se pudo guardar la asignación. Inténtelo de nuevo más tarde.', 'Error');
+            }
+        });
+    }
+
+    getEstatusTexto(estatus: number): string {
+        switch (estatus) {
+            case 4:
+                return 'Pendiente';
+            case 3:
+                return 'Por Revisar';
+            case 2:
+                return 'Rechazado';
+            case 1:
+                return 'Aprobado';
+            default:
+                return 'Desconocido';
         }
     }
 }

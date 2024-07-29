@@ -88,3 +88,4 @@ export class DocumentPorClienteService {
         return throwError(() => new Error('An error occurred while fetching data'));
     }
 }
+

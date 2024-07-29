@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { ClientesService } from '../../services/clientes.service';
 import { DocumentosService } from '../../services/documentos.service';
@@ -13,7 +13,7 @@ import { ICDocumentoCliente } from '../../interfaces/documentoCliente';
 @Component({
     selector: 'app-documentousuario',
     standalone: true,
-    imports: [ReactiveFormsModule, CommonModule],
+    imports: [ReactiveFormsModule, CommonModule, FormsModule],
     templateUrl: './documentousuario.component.html',
     styleUrls: ['./documentousuario.component.scss']
 })
@@ -373,5 +373,20 @@ export class DocumentousuarioComponent implements OnInit {
             default:
                 return 'Desconocido';
         }
+    }
+
+    getEstatusOptions(selectedEstatus: number): { value: number, text: string }[] {
+        const allOptions = [
+            { value: 4, text: 'Pendiente' },
+            { value: 3, text: 'Por Revisar' },
+            { value: 2, text: 'Rechazado' },
+            { value: 1, text: 'Aprobado' }
+        ];
+
+        return allOptions.sort((a, b) => {
+            if (a.value === selectedEstatus) return -1;
+            if (b.value === selectedEstatus) return 1;
+            return 0;
+        });
     }
 }

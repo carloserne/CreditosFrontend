@@ -28,7 +28,6 @@ export class CatConceptoService {
     }
 
     guardarConcepto(concepto: IConcepto): Observable<IConcepto> {
-        console.log(concepto);
         const token = localStorage.getItem('token');
         if (!token) {
             return throwError(() => new Error('No token found'));

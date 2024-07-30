@@ -67,7 +67,7 @@
 </div>
 
 <!-- Modal documentos cliente -->
-<div class="modal fade" id="documentosModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalCloseAsignar()">
+<div class="modal fade" id="documentosModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header d-flex justify-content-center position-relative">
@@ -91,52 +91,90 @@
                                     <!-- Select para elegir documento pendiente -->
                                     <div class="mb-3">
                                         <h5 for="documentosSelect">Selecciona un documento pendiente</h5>
-                                        <select id="documentosSelect" class="form-select" (change)="onDocumentoSelect($event)">
-                                            <option value="" disabled selected>-- Seleccione --</option>
-                                            <option *ngFor="let documento of documentosFaltantes" [value]="documento.idCatalogoDocumento">
-                                                {{ documento.nombre }}
-                                            </option>
-                                        </select>
+                                        <div [formGroup]="documentoCForm">
+                                            <select formControlName="documentoSelect" id="documentosSelect" class="form-select" (change)="onDocumentoSelect($event)">
+                                                <option value="" disabled selected>-- Seleccione --</option>
+                                                <option *ngFor="let documento of documentosFaltantes" [value]="documento.idCatalogoDocumento">
+                                                    {{ documento.nombre }}
+                                                </option>
+                                            </select>
+                                        </div>
                                     </div>
                                     <!-- Documento seleccionado -->
                                     <div *ngIf="selectedDocumento" class="mt-3">
                                         <h5>Documento Seleccionado: {{ selectedDocumento.nombre }}</h5>
                                         <input type="file" (change)="onFileSelect($event)" #fileInput accept=".pdf" />
+                                        <button *ngIf="fileInput && fileInput.files!.length > 0" type="button" class="btn btn-success mt-3" (click)="guardarDocumento()">Subir</button>
                                     </div>
                                 </td>
                                 <td>
-                                    <!-- Documentos Subidos -->
-                                    <ul class="list-group">
-                                        <li *ngFor="let documento of documentosSubidos" class="list-group-item d-flex justify-content-between align-items-center">
-                                            {{ documento.nombre }}
-                                            <button class="btn btn-primary" (click)="verDocumento(documento.documentoBase64)">Ver PDF</button>
-                                        </li>
-                                    </ul>
+                                    <div *ngFor="let documento of documentosSubidos">
+                                        <!-- Documentos Subidos -->
+                                        <ul class="list-group">
+                                            <li *ngFor="let documento of documentosSubidos" class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ documento.nombre }}
+                                                <button class="btn btn-primary" (click)="verDocumento(documento.documentoBase64)">Ver PDF</button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </td>
                                 <td>
                                     <ul class="list-group">
-                                        <li *ngFor="let documento of documentosSubidos" class="list-group-item">
+                                        <li *ngFor="let documento of documentosSubidos" class="list-group-item d-flex align-items-center">
                                             <select class="form-select" [(ngModel)]="documento.estatusSeguimiento">
-                                                <option *ngFor="let option of getEstatusOptions(documento.estatusSeguimiento)" [value]="option.value">
+                                                <option *ngFor="let option of estatusOptions" [value]="option.value">
                                                     {{ option.text }}
                                                 </option>
                                             </select>
+                                            <button class="btn btn-warning text-white ms-2" (click)="actualizarEstatus(documento)">
+                                                Cambiar estatus
+                                            </button>                                            
                                         </li>
                                     </ul>
-                                </td>
+                                </td>                                
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
                     <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-success" (click)="guardarDocumento()">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal asignar documentos -->
+<!-- <div class="modal fade" id="asignarModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center">
+                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <h5>Asignar Documentos</h5>
+                    <form [formGroup]="documentosAsignarForm">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" *ngFor="let documento of documentosFiltrados">
+                                <input class="form-check-input me-1" type="checkbox" [formControlName]="documento.idCatalogoDocumento.toString()" id="{{ documento.idCatalogoDocumento }}">
+                                <label for="{{ documento.idCatalogoDocumento }}">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;{{ documento.nombre }}
+                                </label>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" (click)="guardarAsignacionDocumentos()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+-->
 
 <!-- Modal asignar documentos -->
 <div class="modal fade" id="asignarModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
@@ -151,22 +189,34 @@
                 <div class="card shadow-lg p-4">
                     <h5>Asignar Documentos</h5>
                     <form [formGroup]="documentosAsignarForm">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item" *ngFor="let documento of documentosFiltrados">
-                                <input class="form-check-input me-1" type="checkbox" [formControlName]="documento.idCatalogoDocumento.toString()" id="{{ documento.idCatalogoDocumento }}">
-                                <label for="{{ documento.idCatalogoDocumento }}">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;{{ documento.nombre }}
-                                </label>
-                            </li>
-                        </ul>
+                        <table class="table">
+                            <thead>
+                                <tr class="text-center">
+                                    <th scope="col" class="headerTable-top-left">Estado</th>
+                                    <th scope="col">Nombre del Documento</th>
+                                    <th scope="col" class="headerTable-top-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let documento of documentosFiltrados" class="text-center">
+                                    <td>{{ documentosAsignadosIds.includes(documento.idCatalogoDocumento) ? 'Asignado' : 'No Asignado' }}</td>
+                                    <td>{{ documento.nombre }}</td>
+                                    <td>
+                                        <button type="button" class="btn" 
+                                                [ngClass]="documentosAsignadosIds.includes(documento.idCatalogoDocumento) ? 'btn-danger' : 'btn-success'"
+                                                (click)="toggleAsignacion(documento.idCatalogoDocumento)">
+                                            {{ documentosAsignadosIds.includes(documento.idCatalogoDocumento) ? 'Desasignar' : 'Asignar' }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </form>                    
                 </div>
             </div>
             <div class="modal-footer d-flex justify-content-center">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-success" (click)="guardarAsignacionDocumentos()">Guardar</button>
             </div>
         </div>
     </div>
 </div>
-

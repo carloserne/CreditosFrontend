@@ -28,8 +28,10 @@ export class DocumentousuarioComponent implements OnInit {
     documentosCliente: any[] = [];
     documentosFaltantes: IDocumento[] = [];
     documentosSubidos: any[] = [];
+    documentosTodos: any[] = [];
     documentosMostrar: ICDocumentoCliente[] = [];
     documentosFiltrados: IDocumento[] = [];
+    documentosAsignadosIds: any[] = [];
     selectedFileName: { [key: number]: string } = {};
     idClienteSeleccionado: number = 0;
     selectedDocumento: IDocumento | null = null;
@@ -136,14 +138,14 @@ export class DocumentousuarioComponent implements OnInit {
                         return {
                             ...doc,
                             estatusSeguimiento: asignado ? asignado.estatus : 0,
-                            documentoBase64: asignado ? asignado.documentoBase64 : ''
+                            documentoBase64: asignado ? asignado.documentoBase64 : '',
+                            iDocumentoCliente: asignado ? asignado.idDocumentoCliente : 0
                         };
                     });
 
                 this.documentosFaltantes = filtrar.filter(doc => doc.estatusSeguimiento === 4);
                 this.documentosSubidos = filtrar.filter(doc => doc.estatusSeguimiento !== 4);
-                console.log(this.documentosFaltantes);
-                console.log(this.documentosSubidos);
+                this.documentosTodos = filtrar;
 
                 // Mostrar el modal
                 const modalElement = this.elementRef.nativeElement.querySelector('#documentosModal');
@@ -176,8 +178,6 @@ export class DocumentousuarioComponent implements OnInit {
 
         try {
             await this.obtenerDocumentosCliente(this.idClienteSeleccionado);
-            console.log(this.documentosCliente);
-
             const documentoExistente = this.documentosCliente.find(doc => doc.idDocumento === this.selectedDocumento?.idCatalogoDocumento);
 
             if (!documentoExistente) {
@@ -217,10 +217,14 @@ export class DocumentousuarioComponent implements OnInit {
     onModalClose(): void {
         this.documentoCForm.reset();
         this.documentosFiltrados = [];
+        this.documentosFaltantes = [];
+        this.documentosSubidos = [];
         this.selectedDocumento = null;
-        this.selectedFileName = {};
         this.documentoBase64 = '';
+        this.selectedFileName = {};
         this.fileInput.nativeElement.value = '';
+
+        this.documentoCForm.get('documentoSelect')?.reset();
     }
 
     onDocumentoSelect(event: Event): void {
@@ -271,16 +275,20 @@ export class DocumentousuarioComponent implements OnInit {
 
         this.documentPorClienteService.getDocumentosAsignados(idCliente).subscribe({
             next: (documentosAsignados) => {
-                const documentosAsignadosIds = documentosAsignados.map(doc => doc.idDocumento);
+                console.log(documentosAsignados);
+                this.documentosAsignadosIds = documentosAsignados.map(doc => doc.idDocumento);
 
-                this.documentosFiltrados = this.documentos
-                    .filter(doc => doc.tipo === regimenFiscal)
-                    .filter(doc => !documentosAsignadosIds.includes(doc.idCatalogoDocumento)); 
+                // Filtrar todos los documentos del régimen fiscal seleccionado
+                this.documentosFiltrados = this.documentos.filter(doc => doc.tipo === regimenFiscal);
 
                 this.documentosAsignarForm = this.fb.group({});
 
                 this.documentosFiltrados.forEach(documento => {
-                    this.documentosAsignarForm.addControl(documento.idCatalogoDocumento.toString(), new FormControl(false));
+                    const isAsignado = this.documentosAsignadosIds.includes(documento.idCatalogoDocumento);
+                    this.documentosAsignarForm.addControl(
+                        documento.idCatalogoDocumento.toString(),
+                        new FormControl({ value: isAsignado, disabled: true }) // Deshabilitar todos los checkboxes
+                    );
                 });
 
                 const modalElement = this.elementRef.nativeElement.querySelector('#asignarModal');
@@ -299,6 +307,56 @@ export class DocumentousuarioComponent implements OnInit {
         });
         this.modalTitle = `Asignar documentos a: ${this.clienteNombre} (${this.clienteTipo})`;
     }
+
+    toggleAsignacion(idDocumento: number): void {
+        const isAsignado = this.documentosAsignadosIds.includes(idDocumento);
+    
+        if (isAsignado) {
+            this.desasignarDocumento(idDocumento);
+        } else {
+            this.asignarDocumento(idDocumento);
+        }
+    }
+
+    asignarDocumento(idDocumento: number): void {
+        const data = {
+            idCliente: this.idClienteSeleccionado,
+            idDocumento: idDocumento
+        };
+    
+        this.documentPorClienteService.asignarDocumento(data).subscribe({
+            next: (response) => {
+                this.toastr.success('Documento asignado exitosamente.', 'Éxito');
+                this.documentosAsignadosIds.push(idDocumento);
+            },
+            error: (error) => {
+                console.error('Error al asignar el documento:', error);
+                this.toastr.error('No se pudo asignar el documento. Inténtelo de nuevo más tarde.', 'Error');
+            }
+        });
+    }
+    
+    desasignarDocumento(idDocumento: number): void {
+        const data = {
+            idCliente: this.idClienteSeleccionado,
+            idDocumento: idDocumento
+        };
+    
+        this.documentPorClienteService.desasignarDocumento(data).subscribe({
+            next: (response) => {
+                this.toastr.success('Documento desasignado exitosamente.', 'Éxito');
+                const index = this.documentosAsignadosIds.indexOf(idDocumento);
+                if (index > -1) {
+                    this.documentosAsignadosIds.splice(index, 1);
+                }
+            },
+            error: (error) => {
+                console.error('Error al desasignar el documento:', error);
+                this.toastr.error('No se pudo desasignar el documento. Inténtelo de nuevo más tarde.', 'Error');
+            }
+        });
+    }
+
 
     verDocumento(base64: string): void {
         if (base64.startsWith('data:application/pdf;base64,')) {
@@ -323,7 +381,7 @@ export class DocumentousuarioComponent implements OnInit {
 
     onModalCloseAsignar(): void {
         this.documentosFiltrados = [];
-        this.documentosAsignarForm.reset
+        this.documentosAsignarForm.reset();
     }
 
     guardarAsignacionDocumentos(): void {
@@ -375,6 +433,13 @@ export class DocumentousuarioComponent implements OnInit {
         }
     }
 
+    estatusOptions = [
+        { value: 4, text: 'Pendiente' },
+        { value: 3, text: 'Por Revisar' },
+        { value: 2, text: 'Rechazado' },
+        { value: 1, text: 'Aprobado' }
+    ];
+
     getEstatusOptions(selectedEstatus: number): { value: number, text: string }[] {
         const allOptions = [
             { value: 4, text: 'Pendiente' },
@@ -382,11 +447,30 @@ export class DocumentousuarioComponent implements OnInit {
             { value: 2, text: 'Rechazado' },
             { value: 1, text: 'Aprobado' }
         ];
-
+    
         return allOptions.sort((a, b) => {
             if (a.value === selectedEstatus) return -1;
             if (b.value === selectedEstatus) return 1;
             return 0;
         });
+    }
+
+    actualizarEstatus(documento: any): void {
+        const idDocumentoCliente = documento.iDocumentoCliente;
+        const estatus = documento.estatusSeguimiento;
+
+        this.documentPorClienteService.actualizarEstatus(idDocumentoCliente, estatus).subscribe(
+            (response) => {
+                this.toastr.success('El estatus fue cambiado exitosamente.', 'Éxito');
+                const modalElement = this.elementRef.nativeElement.querySelector('#documentosModal');
+                if (modalElement) {
+                    const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                }
+            },
+            (error) => {
+                console.error('Error al actualizar el estatus', error);
+            }
+        );
     }
 }

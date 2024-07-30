@@ -82,6 +82,30 @@ export class DocumentPorClienteService {
         return this.http.get<ICDocumentoCliente[]>(`${this.apiUrl}/cliente/${idCliente}`, { headers });
     }
 
+    actualizarEstatus(idDocumentoCliente: number, estatus: number): Observable<void> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return throwError(() => new Error('No token found'));
+        }
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        });
+
+        return this.http.put<void>(`${this.apiUrl}/cambiar-estatus/${idDocumentoCliente}/${estatus}`, {}, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    asignarDocumento(data: { idCliente: number, idDocumento: number }) {
+        return this.http.post(`${this.apiUrl}/asignar`, data);
+    }
+
+    desasignarDocumento(data: { idCliente: number, idDocumento: number }) {
+    return this.http.post(`${this.apiUrl}/desasignar`, data);
+    }
+
     private handleError(error: any): Observable<never> {
         // Manejo de errores
         console.error('An error occurred', error);

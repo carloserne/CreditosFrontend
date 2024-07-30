@@ -43,23 +43,47 @@ export class DocumentPorClienteService {
         );
     }
 
-    guardarAsignacion(idCliente: number, idsDocumentos: number[]): Observable<string> {
+    asignarDocumento(idCliente: number, idDocumento: number): Observable<string> {
         const token = localStorage.getItem('token');
         if (!token) {
             return throwError(() => new Error('No token found'));
         }
-    
+
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         });
-    
+
         const payload = {
             idCliente,
-            idsDocumentos
+            idDocumento
         };
-    
+
         return this.http.post<string>(`${this.apiUrl}/asignar`, payload, {
+            headers,
+            responseType: 'text' as 'json'
+        }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
+    desasignarDocumento(idCliente: number, idDocumento: number): Observable<string> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return throwError(() => new Error('No token found'));
+        }
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        });
+
+        const payload = {
+            idCliente,
+            idDocumento
+        };
+
+        return this.http.post<string>(`${this.apiUrl}/desasignar`, payload, {
             headers,
             responseType: 'text' as 'json'
         }).pipe(
@@ -96,14 +120,6 @@ export class DocumentPorClienteService {
         return this.http.put<void>(`${this.apiUrl}/cambiar-estatus/${idDocumentoCliente}/${estatus}`, {}, { headers }).pipe(
             catchError(this.handleError)
         );
-    }
-
-    asignarDocumento(data: { idCliente: number, idDocumento: number }) {
-        return this.http.post(`${this.apiUrl}/asignar`, data);
-    }
-
-    desasignarDocumento(data: { idCliente: number, idDocumento: number }) {
-    return this.http.post(`${this.apiUrl}/desasignar`, data);
     }
 
     private handleError(error: any): Observable<never> {

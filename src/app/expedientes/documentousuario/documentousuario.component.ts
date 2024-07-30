@@ -309,8 +309,9 @@ export class DocumentousuarioComponent implements OnInit {
     }
 
     toggleAsignacion(idDocumento: number): void {
+        let idCliente = this.idClienteSeleccionado;
         const isAsignado = this.documentosAsignadosIds.includes(idDocumento);
-    
+
         if (isAsignado) {
             this.desasignarDocumento(idDocumento);
         } else {
@@ -319,15 +320,15 @@ export class DocumentousuarioComponent implements OnInit {
     }
 
     asignarDocumento(idDocumento: number): void {
-        const data = {
-            idCliente: this.idClienteSeleccionado,
-            idDocumento: idDocumento
-        };
-    
-        this.documentPorClienteService.asignarDocumento(data).subscribe({
+        let idCliente = this.idClienteSeleccionado;
+        console.log(idCliente, idDocumento);
+
+        this.documentPorClienteService.asignarDocumento(idCliente, idDocumento).subscribe({
             next: (response) => {
                 this.toastr.success('Documento asignado exitosamente.', 'Éxito');
                 this.documentosAsignadosIds.push(idDocumento);
+                console.log(this.documentosAsignadosIds);
+                this.cerrarModalAsignar();
             },
             error: (error) => {
                 console.error('Error al asignar el documento:', error);
@@ -335,28 +336,32 @@ export class DocumentousuarioComponent implements OnInit {
             }
         });
     }
-    
+
     desasignarDocumento(idDocumento: number): void {
-        const data = {
-            idCliente: this.idClienteSeleccionado,
-            idDocumento: idDocumento
-        };
-    
-        this.documentPorClienteService.desasignarDocumento(data).subscribe({
+        let idCliente = this.idClienteSeleccionado;
+        console.log(idCliente, idDocumento);
+
+        this.documentPorClienteService.desasignarDocumento(idCliente, idDocumento).subscribe({
             next: (response) => {
-                this.toastr.success('Documento desasignado exitosamente.', 'Éxito');
-                const index = this.documentosAsignadosIds.indexOf(idDocumento);
-                if (index > -1) {
-                    this.documentosAsignadosIds.splice(index, 1);
-                }
+                this.toastr.success('Documento asignado exitosamente.', 'Éxito');
+                this.documentosAsignadosIds = this.documentosAsignadosIds.filter(id => id !== idDocumento);
+                console.log(this.documentosAsignadosIds);
+                this.cerrarModalAsignar();
             },
             error: (error) => {
-                console.error('Error al desasignar el documento:', error);
-                this.toastr.error('No se pudo desasignar el documento. Inténtelo de nuevo más tarde.', 'Error');
+                console.error('Error al asignar el documento:', error);
+                this.toastr.error('No se pudo asignar el documento. Inténtelo de nuevo más tarde.', 'Error');
             }
         });
     }
 
+    cerrarModalAsignar(): void {
+        const modalElement = this.elementRef.nativeElement.querySelector('#asignarModal');
+        if (modalElement) {
+            const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+        }
+    }
 
     verDocumento(base64: string): void {
         if (base64.startsWith('data:application/pdf;base64,')) {
@@ -382,40 +387,6 @@ export class DocumentousuarioComponent implements OnInit {
     onModalCloseAsignar(): void {
         this.documentosFiltrados = [];
         this.documentosAsignarForm.reset();
-    }
-
-    guardarAsignacionDocumentos(): void {
-        const selectedDocumentosIds = this.documentosFiltrados
-            .filter(documento => this.documentosAsignarForm.get(documento.idCatalogoDocumento.toString())?.value)
-            .map(documento => documento.idCatalogoDocumento);
-
-        if (selectedDocumentosIds.length === 0) {
-            this.toastr.warning('Debe seleccionar al menos un archivo.', 'Advertencia');
-            return;
-        }
-
-        const data = {
-            idCliente: this.idClienteSeleccionado,
-            idsDocumentos: selectedDocumentosIds
-        };
-
-        this.documentPorClienteService.guardarAsignacion(this.idClienteSeleccionado, selectedDocumentosIds).subscribe({
-            next: (response) => {
-                this.toastr.success('Asignación guardada exitosamente.', 'Éxito');
-                const modalElement = this.elementRef.nativeElement.querySelector('#asignarModal');
-                if (modalElement) {
-                    const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
-                    modalInstance.hide();
-                }
-                this.documentosFaltantes = this.documentos.filter(documento => 
-                    !selectedDocumentosIds.includes(documento.idCatalogoDocumento)
-                );
-            },
-            error: (error) => {
-                console.error('Error al guardar la asignación:', error);
-                this.toastr.error('No se pudo guardar la asignación. Inténtelo de nuevo más tarde.', 'Error');
-            }
-        });
     }
 
     getEstatusTexto(estatus: number): string {
@@ -458,6 +429,7 @@ export class DocumentousuarioComponent implements OnInit {
     actualizarEstatus(documento: any): void {
         const idDocumentoCliente = documento.iDocumentoCliente;
         const estatus = documento.estatusSeguimiento;
+        console.log(idDocumentoCliente, estatus);
 
         this.documentPorClienteService.actualizarEstatus(idDocumentoCliente, estatus).subscribe(
             (response) => {

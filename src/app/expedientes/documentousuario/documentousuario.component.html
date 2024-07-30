@@ -107,31 +107,31 @@
                                         <button *ngIf="fileInput && fileInput.files!.length > 0" type="button" class="btn btn-success mt-3" (click)="guardarDocumento()">Subir</button>
                                     </div>
                                 </td>
-                                <td>
-                                    <div *ngFor="let documento of documentosSubidos">
-                                        <!-- Documentos Subidos -->
-                                        <ul class="list-group">
-                                            <li *ngFor="let documento of documentosSubidos" class="list-group-item d-flex justify-content-between align-items-center">
-                                                {{ documento.nombre }}
-                                                <button class="btn btn-primary" (click)="verDocumento(documento.documentoBase64)">Ver PDF</button>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                <td colspan="2">
+                                    <!-- Documentos Subidos con estatus -->
+                                    <table class="table">
+                                        <tbody>
+                                            <tr *ngFor="let documento of documentosSubidos">
+                                                <td>{{ documento.nombre }}</td>
+                                                <td>
+                                                    <button class="btn btn-primary" (click)="verDocumento(documento.documentoBase64)">Ver PDF</button>
+                                                </td>
+                                                <td>
+                                                    <select class="form-select" [(ngModel)]="documento.estatusSeguimiento">
+                                                        <option *ngFor="let option of estatusOptions" [value]="option.value">
+                                                            {{ option.text }}
+                                                        </option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-warning text-white ms-2" (click)="actualizarEstatus(documento)">
+                                                        Cambiar estatus
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </td>
-                                <td>
-                                    <ul class="list-group">
-                                        <li *ngFor="let documento of documentosSubidos" class="list-group-item d-flex align-items-center">
-                                            <select class="form-select" [(ngModel)]="documento.estatusSeguimiento">
-                                                <option *ngFor="let option of estatusOptions" [value]="option.value">
-                                                    {{ option.text }}
-                                                </option>
-                                            </select>
-                                            <button class="btn btn-warning text-white ms-2" (click)="actualizarEstatus(documento)">
-                                                Cambiar estatus
-                                            </button>                                            
-                                        </li>
-                                    </ul>
-                                </td>                                
                             </tr>
                         </tbody>
                     </table>

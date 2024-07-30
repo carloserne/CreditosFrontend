@@ -20,12 +20,15 @@
         <h6 class="m-0 font-weight-bold"><i class="fa fa-folder"></i>&nbsp;Listado de documentos</h6>
         <form [formGroup]="documentoForm" class="w-45">
             <select class="inputM" id="regimenFiscal" (change)="onRegimenFiscalCambio($event)">
-              <option value="">Selecciona Regimen Fiscal</option>
-              <option value="FISICA">FISICA</option>
-              <option value="MORAL">MORAL</option>
+                <option value="">Selecciona Regimen Fiscal</option>
+                <option value="FISICA">FISICA</option>
+                <option value="MORAL">MORAL</option>
             </select>
-          </form>
-        <input type="text" class="form-control w-25" placeholder="Buscar documento..." (keyup)="filterDocumentos($event)">
+        </form>
+        <div class="floating-label">
+            <input type="text" class="inputM" placeholder="Buscar Documento" id="buscarDocumento" (keyup)="filterDocumentos($event)" style="width: auto;">
+            <label for="buscarDocumento">Buscar Documento</label>
+        </div>
     </div>
     <fieldset>
         <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">

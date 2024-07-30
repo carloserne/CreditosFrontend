@@ -20,12 +20,15 @@
         <h6 class="m-0 font-weight-bold"><i class="fas fa-handshake"></i>&nbsp;Listado de clientes</h6>
         <form [formGroup]="clienteForm" class="w-45">
             <select class="inputM" id="regimenFiscal" formControlName="regimenFiscal" (change)="onRegimenFiscalCambio($event)">
-              <option value="">Selecciona Regimen Fiscal</option>
-              <option value="FISICA">FISICA</option>
-              <option value="MORAL">MORAL</option>
+                <option value="">Selecciona Regimen Fiscal</option>
+                <option value="FISICA">FISICA</option>
+                <option value="MORAL">MORAL</option>
             </select>
-          </form>
-        <input type="text" class="form-control w-25" placeholder="Buscar cliente..." (keyup)="filterClientes($event)">
+        </form>
+        <div class="floating-label">
+            <input type="text" class="inputM" placeholder="Buscar Cliente" id="buscarCliente" (keyup)="filterClientes($event)" style="width: auto;">
+            <label for="buscarCliente">Buscar Cliente</label>
+        </div>
     </div>
     <fieldset>
         <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">

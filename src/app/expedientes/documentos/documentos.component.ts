@@ -47,25 +47,25 @@ export class DocumentosComponent implements OnInit {
     filterDocumentos(event: any): void {
         const searchTerm = event.target.value.toLowerCase();
         this.filteredDocumentos = this.documentos.filter(documento => 
-          documento.nombre?.toLowerCase().includes(searchTerm) ||
-          documento.tipo?.toLowerCase().includes(searchTerm) ||
-          documento.idEmpresa?.toString().includes(searchTerm)
+            documento.nombre?.toLowerCase().includes(searchTerm) ||
+            documento.tipo?.toLowerCase().includes(searchTerm) ||
+            documento.idEmpresa?.toString().includes(searchTerm)
         );
-      }
+    }
 
     onRegimenFiscalCambio(event: any): void {
         const selectedRegimen = event.target.value;
         this.filtrarDocumentos(selectedRegimen);
-      }
+    }
 
-      filtrarDocumentos(regimen: string): void {
+    filtrarDocumentos(regimen: string): void {
         if (regimen) {
-          console.log(regimen);
-          this.filteredDocumentos = this.documentos.filter(documento => documento.tipo === regimen);
+            console.log(regimen);
+            this.filteredDocumentos = this.documentos.filter(documento => documento.tipo === regimen);
         } else {
           this.filteredDocumentos = this.documentos; // Si no hay un régimen seleccionado, muestra todos los documentos
         }
-      }
+    }
 
     openModal(mode: 'add' | 'edit', documento?: IDocumento): void {
         this.modalTitle = mode === 'add' ? 'Agregar Documento' : 'Editar Documento';

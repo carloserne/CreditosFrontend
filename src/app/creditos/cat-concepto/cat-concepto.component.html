@@ -15,3 +15,102 @@
         </ul>
     </fieldset>
 </div>
+<div class="card shadow mb-4 p-3" id="spacesTable">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold"><i class="fas fa-lightbulb"></i>&nbsp;Listado de conceptos</h6>
+        <div class="floating-label">
+            <input type="text" class="inputM" placeholder="Buscar Concepto" id="buscarConcepto" (keyup)="filterConceptos($event)" style="width: auto;">
+            <label for="buscarConcepto">Buscar Concepto</label>
+        </div>
+    </div>
+    <fieldset>
+        <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <th class="headerTable-top-left">Nombre</th>
+                        <th>Valor</th>
+                        <th>Tipo Valor</th>
+                        <th>IVA</th>
+                        <th class="headerTable-top-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let o of conceptos" class="text-center">
+                        <td>
+                            {{ o.nombreConcepto }}
+                        </td>
+                        <td>
+                            {{ o.valor }}
+                        </td>
+                        <td>
+                            {{ o.tipoValor }}
+                        </td>
+                        <td>
+                            {{ o.iva }}
+                        </td>
+                        <td class="d-flex align-items-center justify-content-center">
+                            <ul class="botonp list-unstyled m-0">
+                                <li class="icon-content">
+                                    <a aria-label="Editar" data-social="editar" (click)="openModal('edit', o)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-pencil-alt fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Editar</div>
+                                </li>
+                                &nbsp;
+                                <li class="icon-content">
+                                    <a aria-label="Eliminar" data-social="eliminar" (click)="eliminar(o)">
+                                        <div class="filled"></div>
+                                        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Eliminar</div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <form [formGroup]="conceptoForm" novalidate (ngSubmit)="guardar()">
+                        <div class="inputs-container mt-4">
+                            <div class="floating-label">
+                                <input type="text" class="inputM" id="nombreConcepto" placeholder="Nombre Concepto" formControlName="nombreConcepto">
+                                <label for="nombreConcepto">Nombre Concepto</label>
+                            </div>
+                            <div class="floating-label">
+                                <input type="number" class="inputM" id="valor" placeholder="Valor" formControlName="valor">
+                                <label for="valor">Valor</label>
+                            </div>
+                            <div class="floating-label">
+                                <select class="inputM" id="tipoValor" formControlName="tipoValor">
+                                    <option value="" disabled selected>Selecciona un tipo</option>
+                                    <option value="PORCENTAJE">PORCENTAJE</option>
+                                    <option value="CANTIDAD">CANTIDAD</option>
+                                </select>
+                                <label for="tipoValor">Tipo Valor</label>
+                            </div>                            
+                        </div>
+                        <div class="modal-footer d-flex justify-content-center mt-4">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-success" (click)="guardar()">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

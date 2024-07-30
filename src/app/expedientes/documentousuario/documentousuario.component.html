@@ -11,12 +11,15 @@
         <h6 class="m-0 font-weight-bold"><i class="fa fa-archive"></i>&nbsp;Listado de documentos de clientes</h6>
         <form [formGroup]="documentoCForm" class="w-45">
             <select class="inputM" id="regimenFiscal" (change)="onRegimenFiscalCambio($event)">
-              <option value="">Selecciona Regimen Fiscal</option>
-              <option value="FISICA">FISICA</option>
-              <option value="MORAL">MORAL</option>
+                <option value="">Selecciona Regimen Fiscal</option>
+                <option value="FISICA">FISICA</option>
+                <option value="MORAL">MORAL</option>
             </select>
-          </form>
-        <input type="text" class="form-control w-25" placeholder="Buscar documento..." (keyup)="filterDocumentosCliente($event)">
+        </form>
+        <div class="floating-label">
+            <input type="text" class="inputM" placeholder="Buscar Documento" id="buscarDocumento" (keyup)="filterDocumentosCliente($event)" style="width: auto;">
+            <label for="buscarDocumento">Buscar Documento</label>
+        </div>
     </div>
     <fieldset>
         <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
@@ -151,38 +154,6 @@
         </div>
     </div>
 </div>
-
-<!-- Modal asignar documentos -->
-<!-- <div class="modal fade" id="asignarModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header d-flex justify-content-center">
-                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
-                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="card shadow-lg p-4">
-                    <h5>Asignar Documentos</h5>
-                    <form [formGroup]="documentosAsignarForm">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item" *ngFor="let documento of documentosFiltrados">
-                                <input class="form-check-input me-1" type="checkbox" [formControlName]="documento.idCatalogoDocumento.toString()" id="{{ documento.idCatalogoDocumento }}">
-                                <label for="{{ documento.idCatalogoDocumento }}">
-                                    &nbsp;&nbsp;&nbsp;&nbsp;{{ documento.nombre }}
-                                </label>
-                            </li>
-                        </ul>
-                    </form>
-                </div>
-            </div>
-            <div class="modal-footer d-flex justify-content-center">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-success" (click)="guardarAsignacionDocumentos()">Guardar</button>
-            </div>
-        </div>
-    </div>
-</div>
--->
 
 <!-- Modal asignar documentos -->
 <div class="modal fade" id="asignarModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">

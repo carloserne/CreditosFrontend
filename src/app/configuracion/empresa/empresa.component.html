@@ -18,7 +18,10 @@
 <div class="card shadow mb-4 p-3" id="spacesTable">
     <div class="card-header py-3 d-flex justify-content-between">
         <h6 class="m-0 font-weight-bold"><i class="fas fa-industry"></i>&nbsp;Listado de empresas</h6>
-        <input type="text" class="form-control w-25" placeholder="Buscar empresa..." (keyup)="filterEmpresas($event)">
+        <div class="floating-label">
+            <input type="text" class="inputM" placeholder="Buscar Empresa" id="buscarEmpresa" (keyup)="filterEmpresas($event)" style="width: auto;">
+            <label for="buscarEmpresa">Buscar Empresa</label>
+        </div>
     </div>
     <fieldset>
         <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">

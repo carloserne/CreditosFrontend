@@ -16,8 +16,9 @@
     </fieldset>
 </div>
 <div class="card shadow mb-4 p-3" id="spacesTable">
-    <div class="card-header py-3">
+    <div class="card-header py-3 d-flex justify-content-between">
         <h6 class="m-0 font-weight-bold"><i class="fas fa-industry"></i>&nbsp;Listado de empresas</h6>
+        <input type="text" class="form-control w-25" placeholder="Buscar empresa..." (keyup)="filterEmpresas($event)">
     </div>
     <fieldset>
         <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
@@ -32,7 +33,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let o of empresas" class="text-center">
+                    <tr *ngFor="let o of filteredEmpresas" class="text-center">
                         <td>{{ o.razonSocial }}</td>
                         <td>{{ o.nombreRepresentanteLegal }}</td>
                         <td>{{ o.rfc }}</td>
@@ -62,7 +63,6 @@
         </div>
     </fieldset>
 </div>
-
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
     <div class="modal-dialog modal-lg modal-dialog-centered">

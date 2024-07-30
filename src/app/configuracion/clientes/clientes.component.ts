@@ -25,6 +25,7 @@ export class ClientesComponent implements OnInit {
     clientes: ICliente[] = [];
     mostrarFisica: boolean = false;
     @ViewChild('modalElement', { static: false }) modalElement!: ElementRef;
+    filteredClientes: any[] = [];
 
     constructor(
         private clientesService: ClientesService,
@@ -46,10 +47,32 @@ export class ClientesComponent implements OnInit {
         this.obtenerClientes();
     }
 
+    filterClientes(event: any): void {
+        const searchTerm = event.target.value.toLowerCase();
+        this.filteredClientes = this.clientes.filter(cliente => 
+          cliente.regimenFiscal?.toLowerCase().includes(searchTerm) ||
+          cliente.idEmpresa?.toString().includes(searchTerm)
+        );
+      }
+
+      onRegimenFiscalCambio(event: any): void {
+        const selectedRegimen = event.target.value;
+        this.filtrarClientes(selectedRegimen);
+      }
+
+      filtrarClientes(regimen: string): void {
+        if (regimen) {
+          this.filteredClientes = this.clientes.filter(cliente => cliente.regimenFiscal === regimen);
+        } else {
+          this.filteredClientes = this.clientes; // Si no hay un régimen seleccionado, muestra todos los clientes
+        }
+      }
+
     obtenerClientes(): void {
         this.clientesService.getClientes().subscribe({
             next: (data: ICliente[]) => {
                 this.clientes = data;
+                this.filteredClientes = this.clientes;
                 console.log(this.clientes);
             },
             error: (error) => {

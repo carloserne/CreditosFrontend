@@ -25,6 +25,7 @@ export class EmpresaComponent implements OnInit {
     modalRef: any;
     @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
     @ViewChild('modalElement', { static: false }) modalElement!: ElementRef;
+    filteredEmpresas: any[] = [];
 
     constructor(
         private elementRef: ElementRef,
@@ -62,6 +63,17 @@ export class EmpresaComponent implements OnInit {
     async ngOnInit() {
         await this.obtenerEmpresas();
     }
+
+    //Método para buscar empresas
+    filterEmpresas(event: any): void {
+        const searchTerm = event.target.value.toLowerCase();
+        this.filteredEmpresas = this.empresas.filter(empresa => 
+          empresa.razonSocial.toLowerCase().includes(searchTerm) ||
+          empresa.nombreRepresentanteLegal.toLowerCase().includes(searchTerm) ||
+          empresa.rfc.toLowerCase().includes(searchTerm) ||
+          empresa.estado.toLowerCase().includes(searchTerm)
+        );
+      }
 
     openModal(mode: 'add' | 'edit', empresa?: IEmpresa): void {
         this.modalTitle = mode === 'add' ? 'Agregar Empresa' : 'Editar Empresa';
@@ -132,6 +144,7 @@ export class EmpresaComponent implements OnInit {
         this.empresasService.getEmpresas().subscribe(
             (data: any[]) => {
                 this.empresas = data;
+                this.filteredEmpresas = this.empresas;
             },
             (error) => {
                 this.toastr.error('No se pudieron obtener las empresas. Inténtelo de nuevo más tarde.', 'Error');

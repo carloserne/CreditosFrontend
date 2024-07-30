@@ -1,1 +1,222 @@
-<p>documentousuario works!</p>
+<h3 class="titulo">Documento Cliente</h3>
+<div class="col-12 card shadow mb-4 p-3">
+    <fieldset class="d-flex align-items-center justify-content-between">
+        <div class="alert alert-warning m-0" role="alert">
+            En este módulo tendrá la capacidad de agregar, modificar y eliminar los documentos de sus respectivos clientes.
+        </div>
+    </fieldset>
+</div>
+<div class="card shadow mb-4 p-3" id="spacesTable">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold"><i class="fa fa-archive"></i>&nbsp;Listado de documentos de clientes</h6>
+    </div>
+    <fieldset>
+        <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <th class="headerTable-top-left">Régimen Fiscal</th>
+                        <th>Nombre</th>
+                        <th>Asignar Documentos</th>
+                        <th class="headerTable-top-right">Subir Documentos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let o of clientes" class="text-center">
+                        <td>{{o.regimenFiscal}}</td>
+                        <td>
+                            <ng-container *ngIf="o.regimenFiscal === 'MORAL'; else personaFisica">
+                                {{(o.datosClienteMorals && o.datosClienteMorals.length > 0) ? (o.datosClienteMorals[0].nombreRepLegal || 'N/A') : 'N/A'}}
+                            </ng-container>
+                            <ng-template #personaFisica>
+                                {{(o.datosClienteFisicas && o.datosClienteFisicas.length > 0 
+                                    && o.datosClienteFisicas[0].idPersonaNavigation 
+                                    ? (o.datosClienteFisicas[0].idPersonaNavigation.nombre + ' ' 
+                                        + o.datosClienteFisicas[0].idPersonaNavigation.apellidoPaterno + ' ' 
+                                        + o.datosClienteFisicas[0].idPersonaNavigation.apellidoMaterno) 
+                                    : 'N/A')}}
+                            </ng-template>
+                        </td>
+                        <td>
+                            <ul class="botonp list-unstyled m-0">
+                                <li class="icon-content">
+                                    <a aria-label="Asignar Documentos" data-social="agregar" (click)="openAsignarDocumentosModal(o.idCliente, o.regimenFiscal!)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-file-export fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Asignar</div>
+                                </li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul class="botonp list-unstyled m-0">
+                                <li class="icon-content">
+                                    <a aria-label="Ver Documentos" data-social="limpiar" (click)="openDocumentosModal(o.idCliente, o.regimenFiscal!)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-folder-open fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Ver</div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+<!-- Modal documentos cliente -->
+<div class="modal fade" id="documentosModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenido del modal -->
+                <div class="card shadow-lg p-4">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="headerTable-top-left">Documentos Pendientes</th>
+                                <th>Documentos Subidos</th>
+                                <th class="headerTable-top-right">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <!-- Select para elegir documento pendiente -->
+                                    <div class="mb-3">
+                                        <h5 for="documentosSelect">Selecciona un documento pendiente</h5>
+                                        <div [formGroup]="documentoCForm">
+                                            <select formControlName="documentoSelect" id="documentosSelect" class="form-select" (change)="onDocumentoSelect($event)">
+                                                <option value="" disabled selected>-- Seleccione --</option>
+                                                <option *ngFor="let documento of documentosFaltantes" [value]="documento.idCatalogoDocumento">
+                                                    {{ documento.nombre }}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Documento seleccionado -->
+                                    <div *ngIf="selectedDocumento" class="mt-3">
+                                        <h5>Documento Seleccionado: {{ selectedDocumento.nombre }}</h5>
+                                        <input type="file" (change)="onFileSelect($event)" #fileInput accept=".pdf" />
+                                        <button *ngIf="fileInput && fileInput.files!.length > 0" type="button" class="btn btn-success mt-3" (click)="guardarDocumento()">Subir</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div *ngFor="let documento of documentosSubidos">
+                                        <!-- Documentos Subidos -->
+                                        <ul class="list-group">
+                                            <li *ngFor="let documento of documentosSubidos" class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ documento.nombre }}
+                                                <button class="btn btn-primary" (click)="verDocumento(documento.documentoBase64)">Ver PDF</button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>
+                                    <ul class="list-group">
+                                        <li *ngFor="let documento of documentosSubidos" class="list-group-item d-flex align-items-center">
+                                            <select class="form-select" [(ngModel)]="documento.estatusSeguimiento">
+                                                <option *ngFor="let option of estatusOptions" [value]="option.value">
+                                                    {{ option.text }}
+                                                </option>
+                                            </select>
+                                            <button class="btn btn-warning text-white ms-2" (click)="actualizarEstatus(documento)">
+                                                Cambiar estatus
+                                            </button>                                            
+                                        </li>
+                                    </ul>
+                                </td>                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal asignar documentos -->
+<!-- <div class="modal fade" id="asignarModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center">
+                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <h5>Asignar Documentos</h5>
+                    <form [formGroup]="documentosAsignarForm">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" *ngFor="let documento of documentosFiltrados">
+                                <input class="form-check-input me-1" type="checkbox" [formControlName]="documento.idCatalogoDocumento.toString()" id="{{ documento.idCatalogoDocumento }}">
+                                <label for="{{ documento.idCatalogoDocumento }}">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;{{ documento.nombre }}
+                                </label>
+                            </li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" (click)="guardarAsignacionDocumentos()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+
+<!-- Modal asignar documentos -->
+<div class="modal fade" id="asignarModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center">
+                <h1 class="modal-title fs-5 w-100 text-center" id="staticBackdropLabel">{{ modalTitle }}</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenido del modal -->
+                <div class="card shadow-lg p-4">
+                    <h5>Asignar Documentos</h5>
+                    <form [formGroup]="documentosAsignarForm">
+                        <table class="table">
+                            <thead>
+                                <tr class="text-center">
+                                    <th scope="col" class="headerTable-top-left">Estado</th>
+                                    <th scope="col">Nombre del Documento</th>
+                                    <th scope="col" class="headerTable-top-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let documento of documentosFiltrados" class="text-center">
+                                    <td>{{ documentosAsignadosIds.includes(documento.idCatalogoDocumento) ? 'Asignado' : 'No Asignado' }}</td>
+                                    <td>{{ documento.nombre }}</td>
+                                    <td>
+                                        <button type="button" class="btn" 
+                                                [ngClass]="documentosAsignadosIds.includes(documento.idCatalogoDocumento) ? 'btn-danger' : 'btn-success'"
+                                                (click)="toggleAsignacion(documento.idCatalogoDocumento)">
+                                            {{ documentosAsignadosIds.includes(documento.idCatalogoDocumento) ? 'Desasignar' : 'Asignar' }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>                    
+                </div>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

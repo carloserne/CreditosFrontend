@@ -4,4 +4,5 @@ export interface IDocumento {
     tipo: string
     estatus: number
     idEmpresa: number
+    estatusSeguimiento?: number
 }

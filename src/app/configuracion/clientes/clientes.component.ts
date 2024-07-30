@@ -51,7 +51,8 @@ export class ClientesComponent implements OnInit {
         const searchTerm = event.target.value.toLowerCase();
         this.filteredClientes = this.clientes.filter(cliente => 
           cliente.regimenFiscal?.toLowerCase().includes(searchTerm) ||
-          cliente.idEmpresa?.toString().includes(searchTerm)
+          (cliente.datosClienteFisicas && cliente.datosClienteFisicas[0] && cliente.datosClienteFisicas[0].idPersonaNavigation && cliente.datosClienteFisicas[0].idPersonaNavigation.nombre?.toLowerCase().includes(searchTerm)) ||
+          (cliente.datosClienteMorals && cliente.datosClienteMorals[0] && cliente.datosClienteMorals[0].nombreRepLegal?.toLowerCase().includes(searchTerm))
         );
       }
 

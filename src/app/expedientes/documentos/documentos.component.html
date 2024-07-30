@@ -16,8 +16,16 @@
     </fieldset>
 </div>
 <div class="card shadow mb-4 p-3" id="spacesTable">
-    <div class="card-header py-3">
+    <div class="card-header py-3 d-flex justify-content-between">
         <h6 class="m-0 font-weight-bold"><i class="fa fa-folder"></i>&nbsp;Listado de documentos</h6>
+        <form [formGroup]="documentoForm" class="w-45">
+            <select class="inputM" id="regimenFiscal" (change)="onRegimenFiscalCambio($event)">
+              <option value="">Selecciona Regimen Fiscal</option>
+              <option value="FISICA">FISICA</option>
+              <option value="MORAL">MORAL</option>
+            </select>
+          </form>
+        <input type="text" class="form-control w-25" placeholder="Buscar documento..." (keyup)="filterDocumentos($event)">
     </div>
     <fieldset>
         <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
@@ -31,7 +39,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let o of documentos" class="text-center">
+                    <tr *ngFor="let o of filteredDocumentos" class="text-center">
                         <td>{{ o.nombre }}</td>
                         <td>{{ o.tipo }}</td>
                         <td>{{ o.idEmpresa }}</td>

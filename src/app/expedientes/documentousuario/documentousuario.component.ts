@@ -39,6 +39,7 @@ export class DocumentousuarioComponent implements OnInit {
     documentosModalForm: FormGroup;
 
     @ViewChild('fileInput') fileInput!: ElementRef;
+    filteredClientes: any[] = [];
 
     constructor(
         private elementRef: ElementRef,
@@ -62,6 +63,28 @@ export class DocumentousuarioComponent implements OnInit {
         this.obtenerDocumentos();
     }
 
+    filterDocumentosCliente(event: any): void {
+        const searchTerm = event.target.value.toLowerCase();
+        this.filteredClientes = this.clientes.filter(cliente => 
+          cliente.regimenFiscal?.toLowerCase().includes(searchTerm) ||
+          (cliente.datosClienteFisicas && cliente.datosClienteFisicas[0] && cliente.datosClienteFisicas[0].idPersonaNavigation && cliente.datosClienteFisicas[0].idPersonaNavigation.nombre?.toLowerCase().includes(searchTerm)) ||
+          (cliente.datosClienteMorals && cliente.datosClienteMorals[0] && cliente.datosClienteMorals[0].nombreRepLegal?.toLowerCase().includes(searchTerm))
+        );
+      }
+
+      onRegimenFiscalCambio(event: any): void {
+        const selectedRegimen = event.target.value;
+        this.filtrarClientes(selectedRegimen);
+      }
+
+      filtrarClientes(regimen: string): void {
+        if (regimen) {
+          this.filteredClientes = this.clientes.filter(cliente => cliente.regimenFiscal === regimen);
+        } else {
+          this.filteredClientes = this.clientes; // Si no hay un régimen seleccionado, muestra todos los clientes
+        }
+      }
+
     obtenerDocumentosCliente(idCliente: number): Promise<void> {
         return new Promise((resolve, reject) => {
             this.documentPorClienteService.getDocumentosCliente(idCliente).subscribe(
@@ -81,6 +104,7 @@ export class DocumentousuarioComponent implements OnInit {
         this.clientesService.getClientes().subscribe({
             next: (data: ICliente[]) => {
                 this.clientes = data;
+                this.filteredClientes = this.clientes;
             },
             error: (error) => {
                 this.toastr.error('Error al obtener la lista de clientes', 'Error');

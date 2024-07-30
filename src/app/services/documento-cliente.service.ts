@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
-import { INuevoDocumento } from './nuevoDocumento';
+import { INuevoDocumento } from '../interfaces/nuevoDocumento';
 import { ICDocumentoCliente } from '../interfaces/documentoCliente';
 
 @Injectable({

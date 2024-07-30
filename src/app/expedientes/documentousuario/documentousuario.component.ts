@@ -7,7 +7,7 @@ import { DocumentPorClienteService } from '../../services/documento-cliente.serv
 import { ICliente } from '../../interfaces/cliente';
 import { IDocumento } from '../../interfaces/documentos';
 import { CommonModule } from '@angular/common';
-import { INuevoDocumento } from '../../services/nuevoDocumento';
+import { INuevoDocumento } from '../../interfaces/nuevoDocumento';
 import { ICDocumentoCliente } from '../../interfaces/documentoCliente';
 
 @Component({

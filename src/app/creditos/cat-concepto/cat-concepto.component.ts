@@ -34,6 +34,7 @@ export class CatConceptoComponent implements OnInit {
             nombreConcepto: ['', Validators.required],
             valor: ['', Validators.required],
             tipoValor: ['', Validators.required],
+            iva: [0, Validators.required],
             estatus: [1],
             idEmpresa: [1]
         });
@@ -52,6 +53,7 @@ export class CatConceptoComponent implements OnInit {
                 nombreConcepto: '',
                 valor: '',
                 tipoValor: '',
+                iva: 0,
                 estatus: 1,
                 idEmpresa: 1
             });
@@ -61,6 +63,7 @@ export class CatConceptoComponent implements OnInit {
                 nombreConcepto: concepto.nombreConcepto,
                 valor: concepto.valor,
                 tipoValor: concepto.tipoValor,
+                iva: concepto.iva,
                 estatus: concepto.estatus,
                 idEmpresa: concepto.idEmpresa
             });

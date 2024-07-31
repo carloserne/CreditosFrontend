@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { IProducto } from '../../interfaces/producto';
 import { ToastrService } from 'ngx-toastr';
 import { ProductosService } from '../../services/productos.service';
+import { CatConceptoService } from '../../services/cat-concepto.service';
+import { IConcepto } from '../../interfaces/concepto';
 
 declare let Swal: any;
 
@@ -12,20 +14,24 @@ declare let Swal: any;
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule],
     templateUrl: './producto.component.html',
-    styleUrl: './producto.component.scss'
+    styleUrls: ['./producto.component.scss']
 })
 export class ProductoComponent implements OnInit {
     modalTitle: string = '';
-    modalRef: any;
     productoForm: FormGroup;
+    conceptoForm: FormGroup;
     productos: IProducto[] = [];
     allProductos: IProducto[] = [];
+    conceptos: IConcepto[] = [];
+    selectedConcepto: IConcepto | null = null;
+    productoSeleccionado: IProducto | null = null;
 
     constructor(
         private elementRef: ElementRef,
         private fb: FormBuilder,
         private toastr: ToastrService,
-        private productosService: ProductosService
+        private productosService: ProductosService,
+        private conceptosService: CatConceptoService
     ) { 
         this.productoForm = this.fb.group({
             idProducto: [0],
@@ -42,12 +48,22 @@ export class ProductoComponent implements OnInit {
             aplicacionDePagos: ['', Validators.required],
             idEmpresa: [1],
             estatus: [1],
-            detalleProducto: [[]]
+            detalleProductos: [[]]
+        });
+
+        this.conceptoForm = this.fb.group({
+            idConcepto: [0],
+            nombreConcepto: ['', Validators.required],
+            valor: ['', Validators.required],
+            tipoValor: ['', Validators.required],
+            estatus: [1],
+            idEmpresa: [1]
         });
     }
 
     ngOnInit(): void {
         this.obtenerProductos();
+        this.obtenerConceptos();
     }
 
     openModal(mode: 'add' | 'edit', producto?: IProducto): void {
@@ -69,7 +85,7 @@ export class ProductoComponent implements OnInit {
                 aplicacionDePagos: '',
                 idEmpresa: 1,
                 estatus: 1,
-                detalleProducto: [{}]
+                detalleProductos: []
             });
         } else if (mode === 'edit' && producto) {
             this.productoForm.patchValue({
@@ -87,7 +103,7 @@ export class ProductoComponent implements OnInit {
                 aplicacionDePagos: producto.aplicacionDePagos,
                 idEmpresa: producto.idEmpresa,
                 estatus: producto.estatus,
-                detalleProducto: producto.detalleProducto
+                detalleProductos: producto.detalleProductos
             });
         }
 
@@ -113,18 +129,18 @@ export class ProductoComponent implements OnInit {
         })
     }
 
-    guardar(){
-        console.log(this.productoForm.value);
-        if(this.productoForm.invalid){
+    guardar() {
+        if (this.productoForm.invalid) {
             this.toastr.error('Llena todos los campos.', 'Error');
             return;
         }
 
         let producto = this.productoForm.value;
 
-        if(producto.idProducto === 0){
+        if (producto.idProducto === 0) {
             producto.estatus = 1;
             producto.idEmpresa = 1;
+            producto.detalleProductos = [];
 
             this.productosService.guardarProducto(producto).subscribe({
                 next: () => {
@@ -135,8 +151,8 @@ export class ProductoComponent implements OnInit {
                 error: (error) => {
                     this.toastr.error('No se pudo guardar el producto. Inténtelo de nuevo más tarde.', 'Error');
                 }
-            })
-        }else{
+            });
+        } else {
             this.productosService.actualizarProducto(producto).subscribe({
                 next: (response) => {
                     this.toastr.success('Producto actualizado con éxito', 'Actualizado');
@@ -146,7 +162,7 @@ export class ProductoComponent implements OnInit {
                 error: (error) => {
                     this.toastr.error('No se pudo actualizar el producto. Inténtelo de nuevo más tarde.', 'Error');
                 }
-            })
+            });
         }
     }
 
@@ -188,5 +204,170 @@ export class ProductoComponent implements OnInit {
 
     onModalClose() {
         this.productoForm.reset();
+    }
+
+    obtenerConceptos() {
+        this.conceptosService.getConceptos().subscribe({
+            next: (conceptos) => {
+                this.conceptos = conceptos;
+            },
+            error: (error) => {
+                this.toastr.error('No se pudieron obtener los documentos. Inténtelo de nuevo más tarde.', 'Error');
+            }
+        });
+    }
+
+    openModalConcepto(producto: IProducto): void {
+        this.productoSeleccionado = { ...producto, detalleProductos: producto.detalleProductos || [] };
+
+        this.selectedConcepto = null;
+        this.conceptoForm.reset();
+        this.conceptoForm.get('tipoValor')?.enable();
+
+        const modalElement = this.elementRef.nativeElement.querySelector('#modalConcepto');
+        if (modalElement) {
+            const modalInstance = new (window as any).bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            modalInstance.show();
+        }
+    }
+
+    onConceptoChange(event: Event): void {
+        const selectElement = event.target as HTMLSelectElement;
+        const selectedId = parseInt(selectElement.value, 10);
+        this.selectedConcepto = this.conceptos.find(concepto => concepto.idConcepto === selectedId) || null;
+
+        if (this.selectedConcepto) {
+            this.conceptoForm.patchValue({
+                idConcepto: this.selectedConcepto.idConcepto,
+                nombreConcepto: this.selectedConcepto.nombreConcepto,
+                valor: this.selectedConcepto.valor,
+                tipoValor: this.selectedConcepto.tipoValor
+            });
+            this.conceptoForm.get('tipoValor')?.disable();
+        }
+    }
+
+    onModalCloseConceptos(): void {
+        this.conceptoForm.reset();
+        this.selectedConcepto = null;
+        this.conceptoForm.get('tipoValor')?.enable();
+        const selectElement = this.elementRef.nativeElement.querySelector('#conceptosSelect') as HTMLSelectElement;
+        if (selectElement) {
+            selectElement.value = "";
+        }
+    }
+
+    guardarConcepto(): void {
+        if (this.selectedConcepto && this.productoSeleccionado) {
+            const nuevoDetalleProducto = {
+                idDetalleProductos: 0,
+                idProducto: this.productoSeleccionado.idProducto,
+                valor: this.conceptoForm.get('valor')?.value,
+                tipoValor: this.selectedConcepto.tipoValor,
+                iva: this.selectedConcepto.iva,
+                idConcepto: this.selectedConcepto.idConcepto,
+                estatus: 1
+            };
+
+            const detalleExistente = this.productoSeleccionado.detalleProductos?.find(detalle => 
+                detalle.idConcepto === nuevoDetalleProducto.idConcepto
+            );
+
+            if (!detalleExistente) {
+                this.productoSeleccionado.detalleProductos!.push(nuevoDetalleProducto);
+            }
+
+            console.log(this.productoSeleccionado);
+
+            this.productosService.actualizarProducto(this.productoSeleccionado).subscribe({
+                next: () => {
+                    this.toastr.success('Concepto guardado con éxito', 'Guardado');
+                    this.obtenerProductos();
+                    this.closeModalConcepto();
+                },
+                error: (error) => {
+                    this.toastr.error('No se pudo guardar el concepto. Inténtelo de nuevo más tarde.', 'Error');
+                }
+            });
+        }
+    }
+
+    closeModalConcepto() {
+        const modalElement = this.elementRef.nativeElement.querySelector('#modalConcepto');
+        if (modalElement) {
+            const modalInstance = (window as any).bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+        }
+        this.onModalCloseConceptos();
+    }
+
+    getFilteredConceptos(): IConcepto[] {
+        if (!this.productoSeleccionado || !this.productoSeleccionado.detalleProductos) {
+            return this.conceptos;
+        }
+        const conceptoIds = this.productoSeleccionado.detalleProductos.map(detalle => detalle.idConcepto);
+        return this.conceptos.filter(concepto => !conceptoIds.includes(concepto.idConcepto));
+    }
+
+    getConceptoNombre(idConcepto: number): string {
+        const concepto = this.conceptos.find(concepto => concepto.idConcepto === idConcepto);
+        return concepto ? concepto.nombreConcepto : 'Desconocido';
+    }
+
+    eliminarConcepto(idConcepto: number): void {
+        if (this.productoSeleccionado) {
+            this.productoSeleccionado.detalleProductos = this.productoSeleccionado.detalleProductos?.filter(
+                detalle => detalle.idConcepto !== idConcepto
+            ) || [];
+
+            // Actualizar el producto en la base de datos o en el estado
+            this.productosService.actualizarProducto(this.productoSeleccionado).subscribe({
+                next: () => {
+                    this.toastr.success('Concepto eliminado con éxito', 'Eliminado');
+                    this.obtenerProductos();
+                    this.closeModalConcepto();
+                },
+                error: (error) => {
+                    this.toastr.error('No se pudo eliminar el concepto. Inténtelo de nuevo más tarde.', 'Error');
+                }
+            });
+        }
+    }
+
+    async preguntaEliminar(idConcepto: number) {
+        const result = await Swal.fire({
+            title: '¿Eliminar este concepto del producto?',
+            text: "¿Estás seguro de eliminar este concepto?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            this.eliminarConcepto(idConcepto);
+        }
+    }
+
+    filterProductos(event: any): void {
+        const searchTerm = event.target.value.toLowerCase();
+        if (searchTerm) {
+            this.productos = this.allProductos.filter(producto =>
+                producto.nombreProducto?.toLowerCase().includes(searchTerm) ||
+                producto.reca?.toString().includes(searchTerm) ||
+                producto.monto?.toString().includes(searchTerm) ||
+                producto.periodicidad?.toLowerCase().includes(searchTerm) ||
+                producto.numPagos?.toString().includes(searchTerm)
+            );
+        } else {
+            this.productos = [...this.allProductos];
+        }
     }
 }

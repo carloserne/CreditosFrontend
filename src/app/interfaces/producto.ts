@@ -15,5 +15,5 @@ export interface IProducto {
     aplicacionDePagos: string,
     idEmpresa: number,
     estatus: 0,
-    detalleProducto?: IConcepto[]
+    detalleProductos?: any[]
 }

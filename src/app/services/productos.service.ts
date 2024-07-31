@@ -32,6 +32,7 @@ export class ProductosService {
         if (!token) {
             return throwError(() => new Error('No token found'));
         }
+        console.log(producto);
 
         const headers = {
             'Content-Type': 'application/json',

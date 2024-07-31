@@ -18,7 +18,10 @@
 <div class="card shadow mb-4 p-3" id="spacesTable">
     <div class="card-header py-3 d-flex justify-content-between">
         <h6 class="m-0 font-weight-bold"><i class="fas fa-box-open"></i>&nbsp;Listado de productos</h6>
-        <!-- Aqui va el input de busqueda -->
+        <div class="floating-label">
+            <input type="text" class="inputM" placeholder="Buscar Producto" id="buscarProducto" (keyup)="filterProductos($event)" style="width: auto;">
+            <label for="buscarProducto">Buscar Producto</label>
+        </div>
     </div>
     <fieldset>
         <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
@@ -52,6 +55,13 @@
                         </td>
                         <td class="d-flex align-items-center justify-content-center">
                             <ul class="botonp list-unstyled m-0">
+                                <li class="icon-content">
+                                    <a aria-label="Concepto" data-social="agregar" (click)="openModalConcepto(o)">
+                                        <div class="filled"></div>
+                                        <i class="fa fa-plus fa-lg"></i>
+                                    </a>
+                                    <div class="tooltip">Concepto</div>
+                                </li>
                                 <li class="icon-content">
                                     <a aria-label="Editar" data-social="editar" (click)="openModal('edit', o)">
                                         <div class="filled"></div>
@@ -162,3 +172,77 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para conceptos -->
+<div class="modal fade" id="modalConcepto" tabindex="-1" aria-labelledby="modalConceptoLabel" aria-hidden="true" (hidden.bs.modal)="onModalCloseConceptos()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="modalConceptoLabel">Agregar Concepto</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <form [formGroup]="conceptoForm">
+                        <div class="inputs-container mt-4">
+                            <div class="floating-label">
+                                <select class="inputM" id="conceptosSelect" (change)="onConceptoChange($event)">
+                                    <option value="" disabled selected>Selecciona un concepto</option>
+                                    <option *ngFor="let concepto of getFilteredConceptos()" [value]="concepto.idConcepto">
+                                        {{ concepto.nombreConcepto }}
+                                    </option>
+                                </select>
+                                <label for="conceptosSelect">Conceptos</label>
+                            </div>
+                        </div>
+                        <div *ngIf="selectedConcepto" class="inputs-container mt-4">
+                            <div class="floating-label">
+                                <input type="number" class="inputM" id="valor" placeholder="Valor" formControlName="valor">
+                                <label for="valor">Valor</label>
+                            </div>
+                            <div class="floating-label">
+                                <select class="inputM" id="tipoValor" formControlName="tipoValor">
+                                    <option value="" disabled selected>Selecciona un tipo</option>
+                                    <option value="PORCENTAJE">PORCENTAJE</option>
+                                    <option value="CANTIDAD">CANTIDAD</option>
+                                </select>
+                                <label for="tipoValor">Tipo Valor</label>
+                            </div>
+                        </div>
+                        <!-- Tabla de conceptos agregados -->
+                        <div *ngIf="productoSeleccionado?.detalleProductos!.length > 0" class="mt-4">
+                            <h5>Conceptos Agregados</h5>
+                            <table class="table table-striped mt-2">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th class="headerTable-top-left">Nombre</th>
+                                        <th>Valor</th>
+                                        <th>Tipo Valor</th>
+                                        <th class="headerTable-top-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let detalle of productoSeleccionado?.detalleProductos" class="text-center">
+                                        <td>{{ getConceptoNombre(detalle.idConcepto) }}</td>
+                                        <td>{{ detalle.valor }}</td>
+                                        <td>{{ detalle.tipoValor }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm" (click)="preguntaEliminar(detalle.idConcepto)">
+                                                Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-center mt-4">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-success" (click)="guardarConcepto()">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

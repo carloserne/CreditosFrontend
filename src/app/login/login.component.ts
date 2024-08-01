@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
     usuario: any;
     errorMessage: string | null = null;
 
-    constructor(private _fb: FormBuilder, private _router: Router, private loginService: LoginService, private toastr: ToastrService) {
+    constructor(private _fb: FormBuilder, private _router: Router, public loginService: LoginService, private toastr: ToastrService) {
         this.FormLogin = this._fb.group({
             username: ['', Validators.required],
             contrasenia: ['', Validators.required]
@@ -32,9 +32,11 @@ export class LoginComponent implements OnInit {
 
     login() {
         if (this.FormLogin.valid) {
+            this.loginService.isLoading = true;
             const { username, contrasenia } = this.FormLogin.value;
             this.loginService.login(username, contrasenia).subscribe(
                 (response) => {
+                    this.loginService.isLoading = false;
                     const token = response.token;
                     if (token) {
                         localStorage.setItem('token', token);
@@ -45,6 +47,7 @@ export class LoginComponent implements OnInit {
                     }
                 },
                 (error) => {
+                    this.loginService.isLoading = false;
                     this.toastr.error("Error de credenciales", 'Inicio incorrecto');
                 }
             );
@@ -55,7 +58,7 @@ export class LoginComponent implements OnInit {
 
     async getUsuario() {
         const token = localStorage.getItem('token');
-    
+
         if (!token) {
             return;
         }

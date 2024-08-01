@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, Observable, of, throwError } from 'rxjs';
 import { IUsuario } from '../interfaces/usuario';
 
 @Injectable({
@@ -9,6 +9,7 @@ import { IUsuario } from '../interfaces/usuario';
 export class LoginService {
     private apiUrl = 'https://localhost:5000/api/Usuario';
     private usuario: IUsuario | null = null;
+    isLoading = false;
 
     constructor(private http: HttpClient) { }
 
@@ -26,7 +27,7 @@ export class LoginService {
 
     isLogged(): boolean {
         const token = localStorage.getItem('token');
-        return token? true : false;
+        return token ? true : false;
     }
 
     getUsuarioDetail(): Observable<IUsuario> {

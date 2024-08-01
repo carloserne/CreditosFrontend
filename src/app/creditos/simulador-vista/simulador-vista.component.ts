@@ -11,8 +11,7 @@ import { ISimulador } from '../../interfaces/simulador';
     standalone: true,
     imports: [
         CommonModule, 
-        ReactiveFormsModule, 
-        SidebarComponent
+        ReactiveFormsModule
     ],
     templateUrl: './simulador-vista.component.html',
     styleUrls: ['./simulador-vista.component.scss']

@@ -1,11 +1,11 @@
 export interface ISimulador {
-    simuladorId: number;
-    metodoCalculo: string;
-    subMetodoCalculo: string;
-    monto: number;
-    numPagos: number;
-    formaPago: string;
-    fechaInicio: Date;
-    interesAnual: number;
-    iva: number;
+  metodoCalculo: string;
+  subMetodoCalculo: string;
+  periodicidad: string;
+  numPagos: number;
+  interesAnual: number;
+  iva: number;
+  ivaExento: boolean;
+  fechaInicio: Date;
+  monto: number;
 }

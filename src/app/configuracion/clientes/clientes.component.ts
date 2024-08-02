@@ -50,31 +50,30 @@ export class ClientesComponent implements OnInit {
     filterClientes(event: any): void {
         const searchTerm = event.target.value.toLowerCase();
         this.filteredClientes = this.clientes.filter(cliente => 
-          cliente.regimenFiscal?.toLowerCase().includes(searchTerm) ||
-          (cliente.datosClienteFisicas && cliente.datosClienteFisicas[0] && cliente.datosClienteFisicas[0].idPersonaNavigation && cliente.datosClienteFisicas[0].idPersonaNavigation.nombre?.toLowerCase().includes(searchTerm)) ||
-          (cliente.datosClienteMorals && cliente.datosClienteMorals[0] && cliente.datosClienteMorals[0].nombreRepLegal?.toLowerCase().includes(searchTerm))
+            cliente.regimenFiscal?.toLowerCase().includes(searchTerm) ||
+            (cliente.datosClienteFisicas && cliente.datosClienteFisicas[0] && cliente.datosClienteFisicas[0].idPersonaNavigation && cliente.datosClienteFisicas[0].idPersonaNavigation.nombre?.toLowerCase().includes(searchTerm)) ||
+            (cliente.datosClienteMorals && cliente.datosClienteMorals[0] && cliente.datosClienteMorals[0].nombreRepLegal?.toLowerCase().includes(searchTerm))
         );
-      }
+    }
 
-      onRegimenFiscalCambio(event: any): void {
+    onRegimenFiscalCambio(event: any): void {
         const selectedRegimen = event.target.value;
         this.filtrarClientes(selectedRegimen);
-      }
+    }
 
-      filtrarClientes(regimen: string): void {
+    filtrarClientes(regimen: string): void {
         if (regimen) {
-          this.filteredClientes = this.clientes.filter(cliente => cliente.regimenFiscal === regimen);
+            this.filteredClientes = this.clientes.filter(cliente => cliente.regimenFiscal === regimen);
         } else {
           this.filteredClientes = this.clientes; // Si no hay un régimen seleccionado, muestra todos los clientes
         }
-      }
+    }
 
     obtenerClientes(): void {
         this.clientesService.getClientes().subscribe({
             next: (data: ICliente[]) => {
                 this.clientes = data;
                 this.filteredClientes = this.clientes;
-                console.log(this.clientes);
             },
             error: (error) => {
                 this.toastr.error('Error al obtener la lista de clientes', 'Error');

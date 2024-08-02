@@ -156,10 +156,18 @@
                             <div class="floating-label">
                                 <select class="inputM" id="aplicacionDePagos" formControlName="aplicacionDePagos">
                                     <option value="" disabled selected>Selecciona aplicación</option>
-                                    <option value="Automatico" >Autom&aacute;tico</option>
-                                    <option value="Manual">Manual</option>
+                                    <option value="vencimientoVigencias" >Vencimiento de vigencias</option>
+                                    <option value="ordenPrelacion">Orden de prelacion</option>
                                 </select>
                                 <label for="aplicacionDePagos">Aplicaci&oacute;n de Pagos</label>
+                            </div>
+                            <div class="floating-label">
+                                <select class="inputM" id="pagoAnticipado" formControlName="pagoAnticipado">
+                                    <option value="" disabled selected>Selecciona pago</option>
+                                    <option value="reduccionPlazo" >Reducción de plazo</option>
+                                    <option value="reduccionPago">Reducción de pago</option>
+                                </select>
+                                <label for="pagoAnticipado">Aplicaci&oacute;n de Pagos</label>
                             </div>
                         </div>
                         <div class="modal-footer d-flex justify-content-center mt-4">

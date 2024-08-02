@@ -12,6 +12,7 @@ export interface IProducto {
     interesAnual: number,
     iva: number,
     interesMoratorio: number,
+    pagoAnticipado: string,
     aplicacionDePagos: string,
     idEmpresa: number,
     estatus: 0,

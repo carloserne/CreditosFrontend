@@ -10,6 +10,8 @@ import { DocumentosComponent } from './expedientes/documentos/documentos.compone
 import { DocumentousuarioComponent } from './expedientes/documentousuario/documentousuario.component';
 import { CatConceptoComponent } from './creditos/cat-concepto/cat-concepto.component';
 import { ProductoComponent } from './creditos/producto/producto.component';
+import { DetalleCreditoComponent } from './creditos/detalle-credito/detalle-credito.component';
+import { SeguimientoCreditosComponent } from './creditos/seguimiento-creditos/seguimiento-creditos.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -17,6 +19,8 @@ export const routes: Routes = [
     { path: 'simulador', component: SimuladorVistaComponent, canActivate: [AuthGuard] },
     { path: 'creditos/conceptos', component: CatConceptoComponent, canActivate: [AuthGuard] },
     { path: 'creditos/productos', component: ProductoComponent, canActivate: [AuthGuard] },
+    { path: 'creditos/detalleCredito', component: DetalleCreditoComponent, canActivate: [AuthGuard] },
+    { path: 'creditos/seguimiento', component: SeguimientoCreditosComponent, canActivate: [AuthGuard] },
     { path: 'expedientes/documentos', component: DocumentosComponent, canActivate: [AuthGuard] },
     { path: 'expedientes/documentousuario', component: DocumentousuarioComponent, canActivate: [AuthGuard] },
     { path: 'configuracion/empresas', component: EmpresaComponent, canActivate: [AuthGuard] },

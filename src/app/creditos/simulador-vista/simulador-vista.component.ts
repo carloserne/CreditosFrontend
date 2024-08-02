@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { SidebarComponent } from '../../sidebar/sidebar.component';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { SimuladorService } from '../../services/simulador.service';
 import { ISimulador } from '../../interfaces/simulador';
@@ -35,7 +35,8 @@ export class SimuladorVistaComponent implements OnInit {
         private toastr: ToastrService, 
         private simuladorService: SimuladorService,
         private productosService: ProductosService,
-        private conceptosService: CatConceptoService
+        private conceptosService: CatConceptoService,
+        private router: Router
     ) {
         this.simuladorForm = this.fb.group({
             productoNombre: ['', Validators.required],
@@ -64,11 +65,9 @@ export class SimuladorVistaComponent implements OnInit {
                 this.productoElegido = producto;
             }
         });
-
     }
 
     llenarForm(producto: IProducto) {
-        console.log(producto);
         this.simuladorForm.patchValue({
             //productoNombre: producto?.nombreProducto
             metodoCalculo: producto?.metodoCalculo,
@@ -77,7 +76,8 @@ export class SimuladorVistaComponent implements OnInit {
             numPagos: producto?.numPagos,
             periodicidad: producto?.periodicidad,
             interesAnual: producto?.interesAnual,
-            interesMoratorio: producto?.interesMoratorio
+            interesMoratorio: producto?.interesMoratorio,
+            iva: producto?.iva
         });
     }
 
@@ -155,21 +155,15 @@ export class SimuladorVistaComponent implements OnInit {
             periodicidad: this.simuladorForm.get('periodicidad')?.value,
             fechaInicio: this.simuladorForm.get('fechaInicio')?.value,
             interesAnual: this.simuladorForm.get('interesAnual')?.value,
+            interesMoratorio: this.simuladorForm.get('interesMoratorio')?.value,
             iva: this.simuladorForm.get('iva')?.value,
             ivaExento: this.simuladorForm.get('ivaExento')?.value
         };
-
-
-        console.log("Datos de simulación: ");
-        console.log(this.simuladorForm.value);
-        console.log(simulacion);
 
         this.simuladorService.obtenerSimulacion(simulacion).subscribe({
             next: (amortizaciones: IAmortizacion[]) => {
                 this.toastr.success('Se ha generado la simulación.', 'Simulación');
                 this.amortizaciones = amortizaciones;
-                console.log("Amortizaciones: ");
-                console.log(amortizaciones);
                 this.mostrarTabla = true;
             },
             error: (error) => {
@@ -184,8 +178,7 @@ export class SimuladorVistaComponent implements OnInit {
         const fin = new Date(fechaFin);
         const diferencia = Math.abs(fin.getTime() - inicio.getTime());
         return Math.ceil(diferencia / (1000 * 60 * 60 * 24));
-      }
-    
+    }
 
     limpiar() {
         this.simuladorForm.reset({
@@ -203,5 +196,17 @@ export class SimuladorVistaComponent implements OnInit {
         this.amortizaciones = [];
         this.mostrarTabla = false;
         this.toastr.info('Los campos se han limpiado.', 'Formulario Limpio');
+    }
+
+    abrirCredito() {
+        const data = {
+            producto: this.productoElegido,
+            conceptos: this.conceptos,
+            simulacion: this.simuladorForm.value
+        };
+
+        this.router.navigate(['creditos/detalleCredito'], {
+            state: { data }
+        });
     }
 }

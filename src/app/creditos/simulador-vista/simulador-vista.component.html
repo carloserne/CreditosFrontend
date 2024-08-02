@@ -85,14 +85,15 @@
         </div>
 
         <div class="card-body">
+            <p *ngIf="productoElegido.detalleProductos!.length == 0">Este crédito no cuenta con conceptos</p>
             <div class="no-padding table-responsive table-hover" style="margin-top: 20px; font-size: 13px;">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" *ngIf="productoElegido.detalleProductos!.length != 0">
                     <thead>
                         <tr>
                             <th class="text-center headerTable-top-left">Concepto</th>
-                            <th class="text-center headerTable-top-right">Medida</th>
+                            <th class="text-center">Medida</th>
                             <th class="text-center headerTable-bottom">Valor de la medida</th>
-                            <th class="text-center">Monto</th>
+                            <th class="text-center headerTable-top-right">Monto</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -107,7 +108,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <div *ngIf="mostrarTabla" class="col-12 card shadow mb-4 p-3">
@@ -141,7 +141,7 @@
                         <td>{{ amortizacion.saldoInsoluto | currency }}</td>
                         <td>{{ amortizacion.capital | currency }}</td>
                         <td>{{ amortizacion.interes | currency }}</td>
-                        <td>{{ amortizacion.ivaSobreInteres| currency }}</td>
+                        <td>{{ amortizacion.ivaSobreInteres | currency }}</td>
                         <td>{{ amortizacion.interesMasIva | currency }}</td>
                         <td>{{ amortizacion.pagoFijo | currency }}</td>
                     </tr>
@@ -149,5 +149,7 @@
             </table>
         </div>
     </fieldset>
+    <div class="text-center mt-3">
+        <button class="btn btn-primary" (click)="abrirCredito()">Abrir crédito</button>
+    </div>
 </div>
-

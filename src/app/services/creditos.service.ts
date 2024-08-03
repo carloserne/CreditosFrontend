@@ -58,6 +58,7 @@ export class CreditosService {
         if (!token) {
             return throwError(() => new Error('No token found'));
         }
+        console.log(credito);
 
         return this.http.put<ICredito>(`${this.apiUrl}/${credito.idCredito}`, credito, {
             headers: {

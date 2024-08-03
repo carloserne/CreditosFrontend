@@ -6,10 +6,6 @@ import { ICredito } from '../../interfaces/credito';
 import { CreditosService } from '../../services/creditos.service';
 import { ICliente } from '../../interfaces/cliente';
 import { ClientesService } from '../../services/clientes.service';
-import { IPersona } from '../../interfaces/persona';
-import { IPersonaMoral } from '../../interfaces/personaMoral';
-import { IAval } from '../../interfaces/aval';
-import { IObligado } from '../../interfaces/obligados';
 
 declare let Swal: any;
 
@@ -35,6 +31,8 @@ export class SeguimientoCreditosComponent implements OnInit {
     avalSeleccionado: any;
     obligadoSeleccionado: any;
     selectedEntity: any;
+    fechaFirma: string = '';
+    fechaActivacion: string = '';
 
     constructor(
         private elementRef: ElementRef,
@@ -148,9 +146,9 @@ export class SeguimientoCreditosComponent implements OnInit {
                             nombreCliente = `${persona.nombre} ${persona.apellidoPaterno} ${persona.apellidoMaterno}`;
                         }
                     }
-    
                     return { ...credito, nombreCliente, regimenFiscal, idCliente };
                 });
+                console.log(this.creditos);
             }
         );
     }
@@ -182,7 +180,6 @@ export class SeguimientoCreditosComponent implements OnInit {
 
     openModalAval(credito: ICredito) {
         this.creditoSeleccionado = credito;
-        console.log(this.creditoSeleccionado);
 
         const modalElement = this.elementRef.nativeElement.querySelector('#staticBackdrop') as HTMLElement;
         if (modalElement) {
@@ -197,9 +194,7 @@ export class SeguimientoCreditosComponent implements OnInit {
     }
 
     openModalObligados(credito: ICredito) {
-        console.log("llegue")
         this.creditoSeleccionado = credito;
-        console.log(this.creditoSeleccionado);
 
         const modalElement = this.elementRef.nativeElement.querySelector('#modalObligados') as HTMLElement;
         if (modalElement) {
@@ -316,17 +311,36 @@ export class SeguimientoCreditosComponent implements OnInit {
             }
         }
 
+        const modalElement6 = this.elementRef.nativeElement.querySelector('#firmarCredito');
+        if (modalElement6) {
+            const modalInstance6 = (window as any).bootstrap.Modal.getInstance(modalElement6);
+            if (modalInstance6) {
+                modalInstance6.hide();
+            }
+        }
+
+        const modalElement7 = this.elementRef.nativeElement.querySelector('#aceptarCredito');
+        if (modalElement7) {
+            const modalInstance7 = (window as any).bootstrap.Modal.getInstance(modalElement7);
+            if (modalInstance7) {
+                modalInstance7.hide();
+            }
+        }
+
         this.creditoForm.reset();
         this.creditoSeleccionado = {} as ICredito;
         this.personaForm.reset();
         this.personaMoralForm.reset();
         this.regimenFiscal = '';
         this.mostrarFisica = false;
+        this.mostrarMoral = false;
         this.selectedEntity = null;
         this.avalSeleccionado = null;
         this.obligadoSeleccionado = null;
         this.datosPersona = [];
         this.datosPersonaMoral = [];
+        this.fechaFirma = '';
+        this.fechaActivacion = '';
     }
 
     onRegimenFiscalChange(event: any): void {
@@ -414,7 +428,6 @@ export class SeguimientoCreditosComponent implements OnInit {
 
     guardarEdicionAval() {
         let index = -1;
-        console.log("aval seleccionado: ", this.avalSeleccionado);
 
         // Encontrar el índice del aval seleccionado
         if (this.avalSeleccionado.idPersonaNavigation) {
@@ -443,7 +456,6 @@ export class SeguimientoCreditosComponent implements OnInit {
             return;
         }
 
-        console.log("final ", this.creditoSeleccionado);
         this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
             next: (response) => {
                 this.toastr.success('Datos actualizados correctamente.');
@@ -457,6 +469,10 @@ export class SeguimientoCreditosComponent implements OnInit {
     }
 
     async eliminarAvalPregunta(aval: any) {
+        if(this.creditoSeleccionado.estatus === 3) {
+            this.toastr.error('No se pueden borrar los datos de un crédito activo');
+            return;
+        }
         const result = await Swal.fire({
             title: '¿Eliminar Aval?',
             text: "¿Estás seguro de eliminar este aval?",
@@ -535,7 +551,6 @@ export class SeguimientoCreditosComponent implements OnInit {
             return;
         }
 
-        console.log("final ", this.creditoSeleccionado);
         this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
             next: (response) => {
                 this.toastr.success('Datos actualizados correctamente.');
@@ -549,6 +564,10 @@ export class SeguimientoCreditosComponent implements OnInit {
     }
 
     async eliminarObligadoPregunta(obligado: any) {
+        if(this.creditoSeleccionado.estatus === 3) {
+            this.toastr.error('No se pueden borrar los datos de un crédito activo');
+            return;
+        }
         const result = await Swal.fire({
             title: '¿Eliminar Obligado?',
             text: "¿Estás seguro de eliminar este obligado?",
@@ -601,17 +620,15 @@ export class SeguimientoCreditosComponent implements OnInit {
 
     openModalEditar(entity: any, tipo: string) {
         this.selectedEntity = entity;
-        
+
         if (!this.selectedEntity) {
             console.error('Entity is not defined');
             return;
         }
-        console.log("credito antes: ", this.creditoSeleccionado);
 
         if(tipo === 'aval') {
             if (this.selectedEntity.idPersonaNavigation) {
                 this.personaForm.patchValue(this.selectedEntity.idPersonaNavigation);
-                console.log("persona form", this.personaForm);
                 this.avalSeleccionado = this.selectedEntity;
 
                 const modalElement = this.elementRef.nativeElement.querySelector('#modalEditarFisicas') as HTMLElement;
@@ -626,7 +643,6 @@ export class SeguimientoCreditosComponent implements OnInit {
                 }
             } else if (this.selectedEntity.idPersonaMoralNavigation) {
                 this.personaMoralForm.patchValue(this.selectedEntity.idPersonaMoralNavigation);
-                console.log("persona moral form", this.personaMoralForm);
                 this.avalSeleccionado = this.selectedEntity;
     
                 const modalElement = this.elementRef.nativeElement.querySelector('#editarMorales') as HTMLElement;
@@ -643,7 +659,6 @@ export class SeguimientoCreditosComponent implements OnInit {
         } else if(tipo === 'obligado') {
             if (this.selectedEntity.idPersonaNavigation) {
                 this.personaForm.patchValue(this.selectedEntity.idPersonaNavigation);
-                console.log("persona form", this.personaForm);
                 this.obligadoSeleccionado = this.selectedEntity;
     
                 const modalElement = this.elementRef.nativeElement.querySelector('#modalEditarFisicas') as HTMLElement;
@@ -658,7 +673,6 @@ export class SeguimientoCreditosComponent implements OnInit {
                 }
             } else if (this.selectedEntity.idPersonaMoralNavigation) {
                 this.personaMoralForm.patchValue(this.selectedEntity.idPersonaMoralNavigation);
-                console.log("persona moral form", this.personaMoralForm);
                 this.obligadoSeleccionado = this.selectedEntity;
     
                 const modalElement = this.elementRef.nativeElement.querySelector('#editarMorales') as HTMLElement;
@@ -676,6 +690,10 @@ export class SeguimientoCreditosComponent implements OnInit {
     }
 
     guardarEdicion(){
+        if(this.creditoSeleccionado.estatus === 3) {
+            this.toastr.error('No se pueden editar los datos de un crédito activo');
+            return;
+        }
         if(this.avalSeleccionado){
             if(this.avalSeleccionado.idPersonaNavigation){
                 if(!this.personaForm.valid){
@@ -711,4 +729,90 @@ export class SeguimientoCreditosComponent implements OnInit {
             }
         }
     }
+
+    openModalFirma(credito: ICredito) {
+        this.creditoSeleccionado = credito;
+
+        const modalElement = this.elementRef.nativeElement.querySelector('#firmarCredito') as HTMLElement;
+        if (modalElement) {
+            const modal = new (window as any).bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            modal.show();
+        } else {
+            console.error('Modal element not found');
+        }
+    }
+
+    openModalAceptar(credito: ICredito) {
+        this.creditoSeleccionado = credito;
+
+        const modalElement = this.elementRef.nativeElement.querySelector('#aceptarCredito') as HTMLElement;
+        if (modalElement) {
+            const modal = new (window as any).bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            modal.show();
+        } else {
+            console.error('Modal element not found');
+        }
+    }
+
+    guardarFirma(){
+        console.log(this.fechaFirma);
+        if(!this.fechaFirma){
+            this.toastr.warning('Por favor, selecciona una fecha.');
+        }
+
+        this.creditoSeleccionado.fechaFirma = this.fechaFirma;
+        this.creditoSeleccionado.estatus = 2;
+
+        this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
+            next: (response) => {
+                this.toastr.success('Crédito firmado correctamente.');
+                this.onModalClose();
+            },
+            error: () => {
+                this.toastr.error('Error al firmar el crédito.');
+            }
+        });
+    }
+
+    guardarActivacion() {
+        if (!this.fechaActivacion) {
+            this.toastr.warning('Por favor, selecciona una fecha.');
+            return;
+        }
+
+        // Verificar que la fecha de firma esté definida
+        if (!this.creditoSeleccionado.fechaFirma) {
+            this.toastr.error('La fecha de aceptación no está definida.');
+            return;
+        }
+
+        const fechaActivacionDate = new Date(this.fechaActivacion);
+        const fechaFirmaDate = new Date(this.creditoSeleccionado.fechaFirma);
+
+        if (fechaActivacionDate < fechaFirmaDate) {
+            this.toastr.warning('La fecha de activación no puede ser anterior a la fecha de firma.');
+            return;
+        }
+
+        this.creditoSeleccionado.fechaActivacion = this.fechaActivacion;
+        this.creditoSeleccionado.estatus = 3;
+
+        this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
+            next: (response) => {
+                this.toastr.success('Crédito activado correctamente.');
+                this.onModalClose();
+            },
+            error: () => {
+                this.toastr.error('Error al activar el crédito.');
+            }
+        });
+    }
+    
+    
 }

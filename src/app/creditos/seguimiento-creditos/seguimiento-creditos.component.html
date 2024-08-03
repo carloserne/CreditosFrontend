@@ -4,15 +4,6 @@
         <div class="alert alert-warning m-0" role="alert">
             En este módulo podrá dar seguimiento a los distintos créditos que se tengan.
         </div>
-        <!-- <ul class="botonp m-0 d-flex">
-            <li class="icon-content">
-                <a aria-label="Agregar" data-social="agregar">
-                    <div class="filled"></div>
-                    <i class="fa fa-plus fa-lg"></i>
-                </a>
-                <div class="tooltip">Agregar</div>
-            </li>
-        </ul> -->
     </fieldset>
 </div>
 <div class="card shadow mb-4 p-3" id="spacesTable">
@@ -41,14 +32,14 @@
                         <td>{{o.numPagos}}</td>
                         <td class="d-flex align-items-center justify-content-center">
                             <ul class="botonp list-unstyled m-0">
-                                <li class="icon-content">
+                                <li *ngIf="o.estatus != 3" class="icon-content">
                                     <a aria-label="Asignar Avales" data-social="agregar" (click)="openModalAval(o)">
                                         <div class="filled"></div>
                                         <i class="fas fa-handshake"></i>
                                     </a>
                                     <div class="tooltip">Avales</div>
                                 </li>
-                                <li class="icon-content">
+                                <li *ngIf="o.estatus != 3" class="icon-content">
                                     <a aria-label="Asignar Obligados" data-social="limpiar" (click)="openModalObligados(o)">
                                         <div class="filled"></div>
                                         <i class="fas fa-users"></i>
@@ -56,14 +47,28 @@
                                     <div class="tooltip">Obligados</div>
                                 </li>
                                 <li class="icon-content">
-                                    <a aria-label="Ver Detalles" data-social="general" (click)="openModalDetalles( o)">
+                                    <a aria-label="Ver Detalles" data-social="general" (click)="openModalDetalles(o)">
                                         <div class="filled"></div>
                                         <i class="fas fa-clipboard-list"></i>
                                     </a>
                                     <div class="tooltip">Detalles</div>
                                 </li>
+                                <li *ngIf="o.estatus == 1" class="icon-content">
+                                    <a aria-label="agregar" data-social="agregar" (click)="openModalFirma(o)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-signature"></i>
+                                    </a>
+                                    <div class="tooltip">Firmar</div>
+                                </li>
+                                <li *ngIf="o.estatus == 2" class="icon-content">
+                                    <a aria-label="agregar" data-social="agregar" (click)="openModalAceptar(o)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <div class="tooltip">Aceptar</div>
+                                </li>
                                 &nbsp;
-                                <li class="icon-content">
+                                <li *ngIf="o.estatus != 3" class="icon-content">
                                     <a aria-label="Eliminar" data-social="eliminar" (click)="eliminar(o)">
                                         <div class="filled"></div>
                                         <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
@@ -877,6 +882,58 @@
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-success" (click)="guardarEdicion()">Guardar</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de firma -->
+<div class="modal fade" id="firmarCredito" tabindex="-1" aria-labelledby="firmarCredito" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="firmarCredito">Firmar crédito</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <div class="inputs-container mt-4">
+                        <div class="floating-label">
+                            <input type="date" class="inputM" id="fechaFirma" [(ngModel)]="fechaFirma" placeholder="Fecha Firma">
+                            <label for="fechaFirma">Fecha Firma</label>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" (click)="guardarFirma()" >Firmar Crédito</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de aceptación -->
+<div class="modal fade" id="aceptarCredito" tabindex="-1" aria-labelledby="aceptarCredito" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="aceptarCredito">Activar crédito</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <div class="inputs-container mt-4">
+                        <div class="floating-label">
+                            <input type="date" class="inputM" id="fechaActivacion" [(ngModel)]="fechaActivacion" placeholder="Fecha Activación">
+                            <label for="fechaActivacion">Fecha Activación</label>
+                        </div>                        
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" (click)="guardarActivacion()">Activar Crédito</button>
                 </div>
             </div>
         </div>

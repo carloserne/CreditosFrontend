@@ -8,8 +8,8 @@ export interface ICredito {
     estatus: number;
     iva: number;
     periodicidad: string;
-    fechaFirma?: Date | null;
-    fechaActivacion?: Date | null;
+    fechaFirma?: string | null;
+    fechaActivacion?: string | null;
     numPagos: number;
     interesOrdinario: number;
     idPromotor: number;

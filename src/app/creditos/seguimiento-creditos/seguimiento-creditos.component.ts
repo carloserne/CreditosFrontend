@@ -32,6 +32,9 @@ export class SeguimientoCreditosComponent implements OnInit {
     datosPersonaMoral: Array<any> = [];
     regimenFiscal: string = '';
     creditoSeleccionado: ICredito = {} as ICredito;
+    avalSeleccionado: any;
+    obligadoSeleccionado: any;
+    selectedEntity: any;
 
     constructor(
         private elementRef: ElementRef,
@@ -154,8 +157,8 @@ export class SeguimientoCreditosComponent implements OnInit {
 
     async eliminar(credito: ICredito) {
         const result = await Swal.fire({
-            title: '¿Eliminar documento?',
-            text: "¿Estás seguro de eliminar este documento?",
+            title: '¿Eliminar crédito?',
+            text: "¿Estás seguro de eliminar este credito?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -165,7 +168,15 @@ export class SeguimientoCreditosComponent implements OnInit {
         });
 
         if (result.isConfirmed) {
-            // Lógica para eliminar el crédito
+            this.creditosService.eliminarCredito(credito.idCredito).subscribe({
+                next: () => {
+                    this.toastr.success('Crédito eliminado con éxito.', 'Eliminado');
+                    this.obtenerCreditosYClientes();
+                },
+                error: (error) => {
+                    this.toastr.error('Error al eliminar el cliente.', 'Error');
+                }
+            });
         }
     }
 
@@ -185,8 +196,24 @@ export class SeguimientoCreditosComponent implements OnInit {
         }
     }
 
+    openModalObligados(credito: ICredito) {
+        console.log("llegue")
+        this.creditoSeleccionado = credito;
+        console.log(this.creditoSeleccionado);
+
+        const modalElement = this.elementRef.nativeElement.querySelector('#modalObligados') as HTMLElement;
+        if (modalElement) {
+            const modal = new (window as any).bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            modal.show();
+        } else {
+            console.error('Modal element not found');
+        }
+    }
+
     guardarAval() {
-        // Limpiar IDs antiguos antes de preparar los datos para el envío
         const limpiarAvales = (avales: any[]) => {
             return avales.map(aval => {
                 const nuevoAval = { ...aval };
@@ -200,7 +227,6 @@ export class SeguimientoCreditosComponent implements OnInit {
             });
         };
 
-        // Limpia los avales existentes antes de agregar nuevos
         if (this.creditoSeleccionado.avals) {
             this.creditoSeleccionado.avals = limpiarAvales(this.creditoSeleccionado.avals);
         } else {
@@ -237,7 +263,6 @@ export class SeguimientoCreditosComponent implements OnInit {
             this.toastr.warning('Por favor, selecciona un tipo de persona');
         }
 
-        console.log("JSON FINAL", this.creditoSeleccionado);
         this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
             next: (response) => {
                 this.toastr.success('Aval guardado correctamente.');
@@ -267,12 +292,41 @@ export class SeguimientoCreditosComponent implements OnInit {
             }
         }
 
+        const modalElement3 = this.elementRef.nativeElement.querySelector('#modalDetalles');
+        if (modalElement3) {
+            const modalInstance3 = (window as any).bootstrap.Modal.getInstance(modalElement3);
+            if (modalInstance3) {
+                modalInstance3.hide();
+            }
+        }
+
+        const modalElement4 = this.elementRef.nativeElement.querySelector('#modalEditarFisicas');
+        if (modalElement4) {
+            const modalInstance4 = (window as any).bootstrap.Modal.getInstance(modalElement4);
+            if (modalInstance4) {
+                modalInstance4.hide();
+            }
+        }
+
+        const modalElement5 = this.elementRef.nativeElement.querySelector('#editarMorales');
+        if (modalElement5) {
+            const modalInstance5 = (window as any).bootstrap.Modal.getInstance(modalElement5);
+            if (modalInstance5) {
+                modalInstance5.hide();
+            }
+        }
+
         this.creditoForm.reset();
         this.creditoSeleccionado = {} as ICredito;
         this.personaForm.reset();
         this.personaMoralForm.reset();
         this.regimenFiscal = '';
         this.mostrarFisica = false;
+        this.selectedEntity = null;
+        this.avalSeleccionado = null;
+        this.obligadoSeleccionado = null;
+        this.datosPersona = [];
+        this.datosPersonaMoral = [];
     }
 
     onRegimenFiscalChange(event: any): void {
@@ -281,23 +335,7 @@ export class SeguimientoCreditosComponent implements OnInit {
         this.mostrarMoral = selectedValue === 'MORAL';
     }
 
-    openModalObligados(credito: ICredito) {
-        this.creditoSeleccionado = credito;
-
-        const modalElement = this.elementRef.nativeElement.querySelector('#modalObligados') as HTMLElement;
-        if (modalElement) {
-            const modal = new (window as any).bootstrap.Modal(modalElement, {
-                backdrop: 'static',
-                keyboard: false
-            });
-            modal.show();
-        } else {
-            console.error('Modal element not found');
-        }
-    }
-
     guardarObligado() {
-        // Limpiar IDs antiguos antes de preparar los datos para el envío
         const limpiarObligados = (obligados: any[]) => {
             return obligados.map(obligado => {
                 const nuevoObligado = { ...obligado };
@@ -309,8 +347,7 @@ export class SeguimientoCreditosComponent implements OnInit {
                 return nuevoObligado;
             });
         };
-    
-        // Limpia los obligados existentes antes de agregar nuevos
+
         if (this.creditoSeleccionado.obligados) {
             this.creditoSeleccionado.obligados = limpiarObligados(this.creditoSeleccionado.obligados);
         } else {
@@ -335,19 +372,18 @@ export class SeguimientoCreditosComponent implements OnInit {
                 this.toastr.warning('Por favor, completa todos los campos obligatorios.');
                 return;
             }
-    
+
             const personaMoral = this.personaMoralForm.value;
             delete personaMoral.idPersona;
             delete personaMoral.idPersonaMoral;
-    
+
             this.creditoSeleccionado.obligados.push({
                 idPersonaMoralNavigation: personaMoral
             });
         } else {
             this.toastr.warning('Por favor, selecciona un tipo de persona');
         }
-    
-        console.log("JSON FINAL obligados", this.creditoSeleccionado);
+
         this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
             next: (response) => {
                 this.toastr.success('Obligado guardado correctamente.');
@@ -358,5 +394,321 @@ export class SeguimientoCreditosComponent implements OnInit {
             }
         });
     }
+
+    openModalDetalles(credito: ICredito) {
+        this.creditoSeleccionado = credito;
+
+        const modalElement = this.elementRef.nativeElement.querySelector('#modalDetalles') as HTMLElement;
+        if (modalElement) {
+            const modal = new (window as any).bootstrap.Modal(modalElement, {
+                backdrop: 'static',
+                keyboard: false
+            });
+            modal.show();
+        } else {
+            console.error('Modal element not found');
+        }
+    }
+
+    onModalCloseDetalles() {}
+
+    guardarEdicionAval() {
+        let index = -1;
+        console.log("aval seleccionado: ", this.avalSeleccionado);
+
+        // Encontrar el índice del aval seleccionado
+        if (this.avalSeleccionado.idPersonaNavigation) {
+            index = this.creditoSeleccionado.avals!.findIndex(a =>
+                a.idPersonaNavigation?.nombre === this.avalSeleccionado.idPersonaNavigation.nombre &&
+                a.idPersonaNavigation?.apellidoPaterno === this.avalSeleccionado.idPersonaNavigation.apellidoPaterno &&
+                a.idPersonaNavigation?.apellidoMaterno === this.avalSeleccionado.idPersonaNavigation.apellidoMaterno
+            );
+        } else if (this.avalSeleccionado.idPersonaMoralNavigation) {
+            index = this.creditoSeleccionado.avals!.findIndex(a =>
+                a.idPersonaMoralNavigation?.razonSocial === this.avalSeleccionado.idPersonaMoralNavigation.razonSocial &&
+                a.idPersonaMoralNavigation?.razonComercial === this.avalSeleccionado.idPersonaMoralNavigation.razonComercial &&
+                a.idPersonaMoralNavigation?.rfc === this.avalSeleccionado.idPersonaMoralNavigation.rfc
+            );
+        }
     
+        if (index !== -1) {
+            // Actualizar el aval seleccionado con los datos del formulario
+            if (this.avalSeleccionado.idPersonaNavigation) {
+                this.creditoSeleccionado.avals![index].idPersonaNavigation = { ...this.personaForm.value };
+            } else if (this.avalSeleccionado.idPersonaMoralNavigation) {
+                this.creditoSeleccionado.avals![index].idPersonaMoralNavigation = { ...this.personaMoralForm.value };
+            }
+        } else {
+            console.error('Aval seleccionado no encontrado en el crédito.');
+            return;
+        }
+
+        console.log("final ", this.creditoSeleccionado);
+        this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
+            next: (response) => {
+                this.toastr.success('Datos actualizados correctamente.');
+                this.onModalClose();
+            },
+            error: (error) => {
+                console.error('Error actualizando los datos:', error);
+                this.toastr.error('Error al actualizar los datos.');
+            }
+        });
+    }
+
+    async eliminarAvalPregunta(aval: any) {
+        const result = await Swal.fire({
+            title: '¿Eliminar Aval?',
+            text: "¿Estás seguro de eliminar este aval?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            this.eliminarAval(aval);
+        }
+    }
+
+    eliminarAval(aval: any) {
+        let index = -1;
+
+        if (aval.idPersonaNavigation) {
+            // Comparación para persona física
+            index = this.creditoSeleccionado.avals!.findIndex(a => 
+                a.idPersonaNavigation?.nombre === aval.idPersonaNavigation.nombre &&
+                a.idPersonaNavigation?.apellidoPaterno === aval.idPersonaNavigation.apellidoPaterno &&
+                a.idPersonaNavigation?.apellidoMaterno === aval.idPersonaNavigation.apellidoMaterno
+            );
+        } else if (aval.idPersonaMoralNavigation) {
+            // Comparación para persona moral
+            index = this.creditoSeleccionado.avals!.findIndex(a => 
+                a.idPersonaMoralNavigation?.razonSocial === aval.idPersonaMoralNavigation.razonSocial &&
+                a.idPersonaMoralNavigation?.razonComercial === aval.idPersonaMoralNavigation.razonComercial &&
+                a.idPersonaMoralNavigation?.rfc === aval.idPersonaMoralNavigation.rfc
+            );
+        }
+
+        if (index !== -1) {
+            this.creditoSeleccionado.avals!.splice(index, 1);
+        }
+
+        this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
+            next: (response) => {
+                this.toastr.success('Aval eliminado correctamente.');
+                this.onModalClose();
+            },
+            error: () => {
+                this.toastr.error('Error al guardar el aval.');
+            }
+        });
+    }
+
+    guardarEdicionObligado() {
+        let index = -1;
+
+        if (this.obligadoSeleccionado.idPersonaNavigation) {
+            index = this.creditoSeleccionado.obligados!.findIndex(o =>
+                o.idPersonaNavigation?.nombre === this.obligadoSeleccionado.idPersonaNavigation.nombre &&
+                o.idPersonaNavigation?.apellidoPaterno === this.obligadoSeleccionado.idPersonaNavigation.apellidoPaterno &&
+                o.idPersonaNavigation?.apellidoMaterno === this.obligadoSeleccionado.idPersonaNavigation.apellidoMaterno
+            );
+        } else if (this.obligadoSeleccionado.idPersonaMoralNavigation) {
+            index = this.creditoSeleccionado.obligados!.findIndex(o =>
+                o.idPersonaMoralNavigation?.razonSocial === this.obligadoSeleccionado.idPersonaMoralNavigation.razonSocial &&
+                o.idPersonaMoralNavigation?.razonComercial === this.obligadoSeleccionado.idPersonaMoralNavigation.razonComercial &&
+                o.idPersonaMoralNavigation?.rfc === this.obligadoSeleccionado.idPersonaMoralNavigation.rfc
+            );
+        }
+    
+        if (index !== -1) {
+            if (this.obligadoSeleccionado.idPersonaNavigation) {
+                this.creditoSeleccionado.obligados![index].idPersonaNavigation = { ...this.personaForm.value };
+            } else if (this.obligadoSeleccionado.idPersonaMoralNavigation) {
+                this.creditoSeleccionado.obligados![index].idPersonaMoralNavigation = { ...this.personaMoralForm.value };
+            }
+        } else {
+            console.error('Obligado seleccionado no encontrado en el crédito.');
+            return;
+        }
+
+        console.log("final ", this.creditoSeleccionado);
+        this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
+            next: (response) => {
+                this.toastr.success('Datos actualizados correctamente.');
+                this.onModalClose();
+            },
+            error: (error) => {
+                console.error('Error actualizando los datos:', error);
+                this.toastr.error('Error al actualizar los datos.');
+            }
+        });
+    }
+
+    async eliminarObligadoPregunta(obligado: any) {
+        const result = await Swal.fire({
+            title: '¿Eliminar Obligado?',
+            text: "¿Estás seguro de eliminar este obligado?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            this.eliminarObligado(obligado);
+        }
+    }
+
+    eliminarObligado(obligado: any) {
+        let index = -1;
+
+        if (obligado.idPersonaNavigation) {
+            // Comparación para persona física
+            index = this.creditoSeleccionado.obligados!.findIndex(a => 
+                a.idPersonaNavigation?.nombre === obligado.idPersonaNavigation.nombre &&
+                a.idPersonaNavigation?.apellidoPaterno === obligado.idPersonaNavigation.apellidoPaterno &&
+                a.idPersonaNavigation?.apellidoMaterno === obligado.idPersonaNavigation.apellidoMaterno
+            );
+        } else if (obligado.idPersonaMoralNavigation) {
+            // Comparación para persona moral
+            index = this.creditoSeleccionado.obligados!.findIndex(a => 
+                a.idPersonaMoralNavigation?.razonSocial === obligado.idPersonaMoralNavigation.razonSocial &&
+                a.idPersonaMoralNavigation?.razonComercial === obligado.idPersonaMoralNavigation.razonComercial &&
+                a.idPersonaMoralNavigation?.rfc === obligado.idPersonaMoralNavigation.rfc
+            );
+        }
+    
+        if (index !== -1) {
+            this.creditoSeleccionado.obligados!.splice(index, 1);
+        }
+
+        this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
+            next: (response) => {
+                this.toastr.success('Obligado eliminado correctamente.');
+                this.onModalClose();
+            },
+            error: () => {
+                this.toastr.error('Error al guardar el obligado.');
+            }
+        });
+    }
+
+    openModalEditar(entity: any, tipo: string) {
+        this.selectedEntity = entity;
+        
+        if (!this.selectedEntity) {
+            console.error('Entity is not defined');
+            return;
+        }
+        console.log("credito antes: ", this.creditoSeleccionado);
+
+        if(tipo === 'aval') {
+            if (this.selectedEntity.idPersonaNavigation) {
+                this.personaForm.patchValue(this.selectedEntity.idPersonaNavigation);
+                console.log("persona form", this.personaForm);
+                this.avalSeleccionado = this.selectedEntity;
+
+                const modalElement = this.elementRef.nativeElement.querySelector('#modalEditarFisicas') as HTMLElement;
+                if (modalElement) {
+                    const modal = new (window as any).bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modal.show();
+                } else {
+                    console.error('Modal element not found');
+                }
+            } else if (this.selectedEntity.idPersonaMoralNavigation) {
+                this.personaMoralForm.patchValue(this.selectedEntity.idPersonaMoralNavigation);
+                console.log("persona moral form", this.personaMoralForm);
+                this.avalSeleccionado = this.selectedEntity;
+    
+                const modalElement = this.elementRef.nativeElement.querySelector('#editarMorales') as HTMLElement;
+                if (modalElement) {
+                    const modal = new (window as any).bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modal.show();
+                } else {
+                    console.error('Modal element not found');
+                }
+            }
+        } else if(tipo === 'obligado') {
+            if (this.selectedEntity.idPersonaNavigation) {
+                this.personaForm.patchValue(this.selectedEntity.idPersonaNavigation);
+                console.log("persona form", this.personaForm);
+                this.obligadoSeleccionado = this.selectedEntity;
+    
+                const modalElement = this.elementRef.nativeElement.querySelector('#modalEditarFisicas') as HTMLElement;
+                if (modalElement) {
+                    const modal = new (window as any).bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modal.show();
+                } else {
+                    console.error('Modal element not found');
+                }
+            } else if (this.selectedEntity.idPersonaMoralNavigation) {
+                this.personaMoralForm.patchValue(this.selectedEntity.idPersonaMoralNavigation);
+                console.log("persona moral form", this.personaMoralForm);
+                this.obligadoSeleccionado = this.selectedEntity;
+    
+                const modalElement = this.elementRef.nativeElement.querySelector('#editarMorales') as HTMLElement;
+                if (modalElement) {
+                    const modal = new (window as any).bootstrap.Modal(modalElement, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    modal.show();
+                } else {
+                    console.error('Modal element not found');
+                }
+            }
+        }
+    }
+
+    guardarEdicion(){
+        if(this.avalSeleccionado){
+            if(this.avalSeleccionado.idPersonaNavigation){
+                if(!this.personaForm.valid){
+                    this.toastr.warning('Por favor, completa todos los campos obligatorios.');
+                    return;
+                }else{
+                    this.guardarEdicionAval();
+                }
+            } else if(this.avalSeleccionado.idPersonaMoralNavigation){
+                if(!this.personaMoralForm.valid){
+                    this.toastr.warning('Por favor, completa todos los campos obligatorios.');
+                    return;
+                }else{
+                    this.guardarEdicionAval();
+                }
+            }
+        }
+        else if (this.obligadoSeleccionado){
+            if(this.obligadoSeleccionado.idPersonaNavigation){
+                if(!this.personaForm.valid){
+                    this.toastr.warning('Por favor, completa todos los campos obligatorios.');
+                    return;
+                }else{
+                    this.guardarEdicionObligado();
+                }
+            } else if(this.obligadoSeleccionado.idPersonaMoralNavigation){
+                if(!this.personaMoralForm.valid){
+                    this.toastr.warning('Por favor, completa todos los campos obligatorios.');
+                    return;
+                }else{
+                    this.guardarEdicionObligado();
+                }
+            }
+        }
+    }
 }

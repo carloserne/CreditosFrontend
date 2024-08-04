@@ -1,0 +1,17 @@
+/* estilos.scss o styles.scss */
+.pending-status {
+    background-color: rgb(251, 251, 104); /* Color para pendiente */
+  }
+  
+  .running-status {
+    background-color: lightblue; /* Color para corriendo */ 
+  }
+  
+  .moratorium-status {
+    background-color: rgb(255, 223, 164); /* Color para con moratorios */
+  }
+  
+  .paid-status {
+    background-color: lightgreen; /* Color para pagada */
+  }
+  

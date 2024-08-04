@@ -39,6 +39,7 @@ export class SimuladorService {
 
         const headers = {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         };
 
         return this.http.post<IAmortizacion[]>(this.apiUrl, datosSimulacion, { headers }).pipe(

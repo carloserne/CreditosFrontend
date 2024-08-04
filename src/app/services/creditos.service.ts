@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, Observable, throwError } from 'rxjs';
 import { ICredito } from '../interfaces/credito';
+import { IAmortizacionActiva } from '../interfaces/amortizacionActiva';
 
 @Injectable({
     providedIn: 'root'
@@ -87,6 +88,23 @@ export class CreditosService {
             catchError(error => {
                 console.error('Error al eliminar la empresa', error);
                 return throwError(() => new Error('Error al eliminar la empresa'));
+            })
+        );
+    }
+
+    obtenerAmortizaciones(idCredito: number): Observable<IAmortizacionActiva[]> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return throwError(() => new Error('No token found'));
+        }
+        return this.http.get<any>(`${this.apiUrl}/Amortizaciones/${idCredito}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).pipe(
+            catchError(error => {
+                console.error('Error al obtener las amortizaciones', error);
+                return throwError(() => new Error('Error al obtener las amortizaciones'));
             })
         );
     }

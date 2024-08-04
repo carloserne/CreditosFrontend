@@ -1,0 +1,235 @@
+<h3 class="titulo">Pagos</h3>
+<div class="col-12 card shadow mb-4 p-3">
+    <fieldset class="d-flex align-items-center justify-content-between">
+        <div class="alert alert-warning m-0" role="alert">
+            En este modulo tendra la capacidad de agregar y eliminar pagos a los créditos activos.
+        </div>
+    </fieldset>
+</div>
+
+<div *ngIf="mostrarTablaCreditos" class="card shadow mb-4 p-3" id="spacesTable">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h6 class="m-0 font-weight-bold"><i class="fa fa-folder"></i>&nbsp;Listado de Créditos Activos</h6>
+    </div>
+    <fieldset>
+        <div class="no-padding table-responsive" style="margin-top: 20px; font-size: 13px;">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <th class="headerTable-top-left">Credito</th>
+                        <th>Monto</th>
+                        <th>Periodicidad</th>
+                        <th>N&uacute;mero Pagos</th>
+                        <th class="headerTable-top-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let ca of creditosActivos" class="text-center">
+                        <td>
+                            {{ ca.idCredito }}
+                        </td>
+                        <td>
+                            {{ ca.monto }}
+                        </td>
+                        <td>
+                            {{ ca.periodicidad }}
+                        </td>
+                        <td>
+                            {{ ca.numPagos }}
+                        </td>
+                        <td class="d-flex align-items-center justify-content-center">
+                            <ul class="botonp list-unstyled m-0">
+                                <li class="icon-content">
+                                    <!-- <a aria-label="Editar" data-social="editar" (click)="openModal('edit', o)"> -->
+                                    <a aria-label="Editar" data-social="editar" (click)="obtenerAmortizaciones(ca.idCredito)">
+                                        <div class="filled"></div>
+                                        <i class="fas fa-table fa-lg" aria-hidden="true"></i>
+                                    </a>
+                                    <div class="tooltip">Mostrar Amortizaciones</div>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </fieldset>
+</div>
+
+
+<div *ngIf="mostrarAmortizaciones" class="col-12 card shadow mb-4 p-3">
+    <fieldset class="d-flex align-items-center justify-content-between">
+        <div class="alert m-0" role="alert" style="background-color: #023e73; color: white">
+            Amortizaciones correspondientes al credito {{ idCreditoSeleccionado }}.
+        </div>
+        <ul class="botonp m-0 d-flex">
+            <li class="icon-content">
+                <a aria-label="Agregar" data-social="editar" (click)="regresar()">
+                    <div class="filled"></div>
+                    <i class="fa fa-arrow-left fa-lg"></i>
+                </a>
+                <div class="tooltip">Regresar</div>
+            </li>
+        </ul>
+        <ul class="botonp m-0 d-flex">
+            <li class="icon-content">
+                <a aria-label="Agregar" data-social="agregar" (click)="openModal()">
+                    <div class="filled"></div>
+                    <i class="fa fa-plus fa-lg"></i>
+                </a>
+                <div class="tooltip">Agregar Pago</div>
+            </li>
+        </ul>
+
+    </fieldset>
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-line"></i> Amortizaciones del crédito</h6>
+      </div>
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let amortizacion of amortizacionesAct; let i = index">
+          <mat-expansion-panel-header [ngClass]="getStatusClass(amortizacion.estatus)">
+            <mat-panel-title>
+              Pago {{ i + 1 }} - Fecha: {{ amortizacion.fechaInicio | date:'dd/MM/yyyy' }} a {{ amortizacion.fechaFin | date:'dd/MM/yyyy' }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-card>
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center">Saldo Insoluto</th>
+                    <th class="text-center">Capital</th>
+                    <th class="text-center">Interés</th>
+                    <th class="text-center">IVA</th>
+                    <th class="text-center">Interés + IVA</th>
+                    <th class="text-center">Pago Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="text-center">
+                    <td>{{ amortizacion.saldoInsoluto | currency }}</td>
+                    <td>{{ amortizacion.capital | currency }}</td>
+                    <td>{{ amortizacion.interesOrdinario | currency }}</td>
+                    <td>{{ amortizacion.iva | currency }}</td>
+                    <td>{{ amortizacion.interesMasIva | currency }}</td>
+                    <td>{{ amortizacion.pagoFijo | currency }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </mat-card>
+        </mat-expansion-panel>
+      </mat-accordion>
+      
+
+<div *ngIf="mostrarPagos" class="col-12 card shadow mb-4 p-3">
+    <fieldset class="d-flex align-items-center justify-content-between">
+        <div class="alert m-0" role="alert" style="background-color: #023e73; color: white">
+            Pagos correspondientes al credito {{ idCreditoSeleccionado }}.
+        </div>
+    </fieldset>
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold"><i class="fas fa-dollar-sign"></i> Pagos del crédito</h6>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center">Fecha</th>
+                    <th class="text-center">Monto</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let o of pagos" class="text-center">
+                    <td>
+                        {{ o.fechaAplicacion | date:'dd/MM/yyyy' }}
+                    </td>
+                    <td>
+                        {{ o.montoPago | currency }}
+                    </td>
+                    <td *ngIf="o.estatus === 1" class="d-flex align-items-center justify-content-center">
+                        <ul class="botonp list-unstyled m-0">
+                            <li class="icon-content">
+                                <a aria-label="Aplicar" data-social="agregar" (click)="openModalAplicar(o.idPago)">
+                                    <div class="filled"></div>
+                                    <i class="fas fa-dollar-sign fa-lg" aria-hidden="true"></i>
+                                </a>
+                                <div class="tooltip">Aplicar pago</div>
+                            </li>
+                        </ul>
+                    </td>
+                    <td *ngIf="o.estatus === 2" class="d-flex align-items-center justify-content-center">
+                        <ul class="botonp list-unstyled m-0">
+                            <li class="icon-content">
+                                <a aria-label="Aplicar" data-social="agregar">
+                                    <div class="filled"></div>
+                                    <i class="fas fa-check fa-lg" aria-hidden="true"></i>
+                                </a>
+                                <div class="tooltip">Aplicado</div>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!--Modal-->
+<div class="modal fade" id="modalPago" tabindex="-1" aria-labelledby="modalPagoLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="modalPagoLabel">Agregar Pago</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <form [formGroup]="pagoForm">
+                        <div class="inputs-container mt-4">
+                            <div class="floating-label">
+                                <input type="number" class="inputM" id="id" placeholder="Id Credito" formControlName="idCredito" value="{{ idCreditoSeleccionado }}" readonly>
+                                <label for="id">Id Credito</label>
+                            </div>
+                            <div class="floating-label">
+                                <input type="number" class="inputM" id="monto" placeholder="Monto" formControlName="montoPago">
+                                <label for="monto">Monto</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-center mt-4">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-success" (click)="registrarPago()">Guardar</button>
+                        </div>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Modal-->
+<div class="modal fade" id="modalAplicar" tabindex="-1" aria-labelledby="modalPagoLabel" aria-hidden="true" (hidden.bs.modal)="onModalClose()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-center position-relative">
+                <h1 class="modal-title fs-5 w-100 text-center" id="modalPagoLabel">Aplicar Pago</h1>
+                <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-lg p-4">
+                    <form [formGroup]="pagoForm">
+                        
+                        <div class="modal-footer d-flex justify-content-center mt-4">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-success" (click)="aplicarPago()">Guardar</button>
+                        </div>
+                        </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

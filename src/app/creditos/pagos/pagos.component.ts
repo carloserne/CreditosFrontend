@@ -30,6 +30,7 @@ export class PagosComponent implements OnInit {
   mostrarPagos: boolean = false;
   idCreditoSeleccionado: number = 0;
   idPagoAAplicar: number = 0;
+  estatusAmortizacion: string = '';
   pagoAplicado: IPagoAplicado = { idCredito: 0, montoPago: 0 };
   pagos: IPago[] = [];
 
@@ -57,7 +58,7 @@ export class PagosComponent implements OnInit {
     this.pagosService.getPagos(idCredito).subscribe({
         next: (pagos) => {
             this.pagos = pagos;
-            console.log(this.pagos);
+            //console.log(this.pagos);
             this.mostrarPagos = true;
         },
         error: (error) => {
@@ -74,7 +75,7 @@ export class PagosComponent implements OnInit {
             if(this.creditos.length > 0) {
                 this.creditosActivos = this.creditos.filter(credito => credito.estatus === 3);
             }
-            console.log(this.creditosActivos);
+            //console.log(this.creditosActivos);
         },
         error: (error) => {
             this.toastr.error('No se pudieron obtener los productos. Inténtelo de nuevo más tarde.', 'Error');
@@ -82,14 +83,17 @@ export class PagosComponent implements OnInit {
     })
   }
   obtenerAmortizaciones(idCredito: number) {
+    this.calcularMoratorios(idCredito);
     this.creditosService.obtenerAmortizaciones(idCredito).subscribe({
         next: (amortizaciones) => {
             this.amortizacionesAct = amortizaciones;
-            console.log(this.amortizacionesAct);
+            //console.log(this.amortizacionesAct);
             this.idCreditoSeleccionado = idCredito;
+            //console.log("Id Credito: " + this.idCreditoSeleccionado);
             this.mostrarAmortizaciones = true;
             this.mostrarTablaCreditos = false;
             this.obtenerPagos(idCredito);
+            
         },
         error: (error) => {
             this.toastr.error('No se pudieron obtener las amortizaciones. Inténtelo de nuevo más tarde.', 'Error');
@@ -100,25 +104,59 @@ export class PagosComponent implements OnInit {
   }
 
 
-  // verificarCredito(idCredito: number) {
-  //   this.idCreditoSeleccionado = idCredito;
-  //   let amortizaciones = this.amortizacionesAct;
-  //   let contador: number = 0;
+  calcularMoratorios(idCredito: number) {
+    this.creditosService.actualizarMoratorios(idCredito).subscribe({
+        next: (response) => {
+            //console.log(response);
+            //this.actualizarTablas();
+        },
+        error: (error) => {
+            this.toastr.error('No se pudieron actualizar los moratorios. Inténtelo de nuevo más tarde.', 'Error');
+        }
+    })
+  }
 
-  //   amortizaciones.forEach(am => {
-  //     if (am.estatus === 4){
-  //       contador++;
-  //     }
-  //   });
+  actualizarTablas() {
+    this.obtenerPagos(this.idCreditoSeleccionado);
+    this.obtenerCreditos();
+    this.obtenerAmortizaciones(this.idCreditoSeleccionado);
+  }
 
-  //   console.log("Contador: " + contador);
 
-  //   // if (amortizaciones.length === contador) {
-  //   if (true) {
-  //     this.creditoSeleccionado = this.creditosActivos.filter(credito => credito.idCredito === idCredito)[0];
-  //     console.log(this.creditoSeleccionado);
-  //   }
-  // }
+  verificarCredito(idCredito: number) {
+    this.idCreditoSeleccionado = idCredito;
+    let amortizaciones = this.amortizacionesAct;
+    let contador: number = 0;
+
+    amortizaciones.forEach(am => {
+      if (am.estatus === 4){
+        contador++;
+      }
+    });
+
+    //console.log("Contador: " + contador);
+
+    if (amortizaciones.length === contador) {
+      this.creditoSeleccionado = this.creditosActivos.filter(credito => credito.idCredito === idCredito)[0];
+      //console.log(this.creditoSeleccionado);
+
+      this.creditoSeleccionado.estatus = 4;
+      
+      this.creditosService.actualizarCredito(this.creditoSeleccionado).subscribe({
+        next: (response) => {
+            this.toastr.success('Crédito modificado correctamente.');
+            this.regresar();
+        },
+        error: () => {
+            this.toastr.error('Error al modificar el crédito.');
+        }
+      });
+
+    } else {
+      //console.log("Credito al corriente");
+    }
+    //this.actualizarTablas();
+  }
 
   
   aplicarPago() {
@@ -127,19 +165,20 @@ export class PagosComponent implements OnInit {
       next: (response: string) => {
         this.closeModalAplicar();
         this.toastr.success("El pago se aplicó con exito", 'Éxito');
-        console.log("response: " + response);
+        this.actualizarTablas();
+        //console.log("response: " + response);
       },
       error: (error) => {
-        console.error('Error al registrar el pago:', error);
+        console.error('Error al aplicar el pago:', error);
         if (error.error && error.error.message) {
           this.toastr.error(error.error.message, 'Error');
         } else {
-          this.toastr.error('Ocurrió un error al registrar el pago. Por favor, inténtelo de nuevo.', 'Error');
+          this.toastr.error('Ocurrió un error al aplicar el pago. Por favor, inténtelo de nuevo.', 'Error');
         }
       }
     });
-    this.obtenerPagos(this.idCreditoSeleccionado);
-    this.obtenerAmortizaciones(this.idCreditoSeleccionado);
+    
+    this.verificarCredito(this.idCreditoSeleccionado);
   }
 
 
@@ -147,7 +186,14 @@ export class PagosComponent implements OnInit {
     if (this.pagoForm.valid) {
       const { idCredito, montoPago } = this.pagoForm.value;
       this.pagoAplicado.idCredito = this.idCreditoSeleccionado;
-      this.pagoAplicado.montoPago = montoPago;
+      //console.log(this.pagoAplicado.idCredito); 
+
+      if (montoPago <= 0) {
+        this.toastr.warning('Por favor, introduce un valor mayor a 0.');
+        return;
+      }else {
+        this.pagoAplicado.montoPago = montoPago;
+      }
   
       // console.log("pagoAplicado: ");
       // console.log(this.pagoForm.value);
@@ -156,7 +202,7 @@ export class PagosComponent implements OnInit {
       this.pagosService.registrarPago(this.pagoAplicado).subscribe({
         next: (response: string) => {
           this.pagoForm.patchValue({ montoPago: 0 });
-          this.toastr.success(response, 'Éxito');  // Muestra el mensaje del servidor
+          this.toastr.success("Pago Registrado Con Éxito", 'Éxito');  // Muestra el mensaje del servidor
           this.modalTitle = '';
           this.closeModal();
           this.obtenerPagos(this.idCreditoSeleccionado);
@@ -230,15 +276,20 @@ closeModalAplicar() {
 getStatusClass(status: number): string {
   switch (status) {
     case 1:
+      this.estatusAmortizacion = 'Pendiente';
       return 'pending-status';
     case 2:
+      this.estatusAmortizacion = 'Corriendo';
       return 'running-status';
     case 3:
+      this.estatusAmortizacion = 'Con Moratorio';
       return 'moratorium-status';
     case 4:
+      this.estatusAmortizacion = 'Pagada';
       return 'paid-status';
     default:
       return '';
   }
 }
+
 }

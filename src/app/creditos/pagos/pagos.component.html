@@ -1,5 +1,5 @@
 <h3 class="titulo">Pagos</h3>
-<div class="col-12 card shadow mb-4 p-3">
+<div *ngIf="!mostrarAmortizaciones" class="col-12 card shadow mb-4 p-3">
     <fieldset class="d-flex align-items-center justify-content-between">
         <div class="alert alert-warning m-0" role="alert">
             En este modulo tendra la capacidad de agregar y eliminar pagos a los créditos activos.
@@ -83,46 +83,49 @@
 
     </fieldset>
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-line"></i> Amortizaciones del crédito</h6>
+  <h6 class="m-0 font-weight-bold"><i class="fas fa-chart-line"></i> Amortizaciones del crédito</h6>
+</div>
+<mat-accordion>
+  <mat-expansion-panel *ngFor="let amortizacion of amortizacionesAct; let i = index">
+    <mat-expansion-panel-header>
+      <div class="status-circle" [ngClass]="getStatusClass(amortizacion.estatus)"></div>
+      <mat-panel-title>
+        Pago {{ i + 1 }} - Fecha: {{ amortizacion.fechaInicio | date:'dd/MM/yyyy' }} a {{ amortizacion.fechaFin | date:'dd/MM/yyyy' }}
+        - Estatus: {{ estatusAmortizacion }}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-card>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th class="text-center">Saldo Insoluto</th>
+              <th class="text-center">Capital</th>
+              <th class="text-center">Interés</th>
+              <th class="text-center">IVA</th>
+              <th class="text-center">Interés + IVA</th>
+              <th class="text-center">Pago Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="text-center">
+              <td>{{ amortizacion.saldoInsoluto | currency }}</td>
+              <td>{{ amortizacion.capital | currency }}</td>
+              <td>{{ amortizacion.interesOrdinario | currency }}</td>
+              <td>{{ amortizacion.iva | currency }}</td>
+              <td>{{ amortizacion.interesMasIva | currency }}</td>
+              <td>{{ amortizacion.pagoFijo | currency }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <mat-accordion>
-        <mat-expansion-panel *ngFor="let amortizacion of amortizacionesAct; let i = index">
-          <mat-expansion-panel-header [ngClass]="getStatusClass(amortizacion.estatus)">
-            <mat-panel-title>
-              Pago {{ i + 1 }} - Fecha: {{ amortizacion.fechaInicio | date:'dd/MM/yyyy' }} a {{ amortizacion.fechaFin | date:'dd/MM/yyyy' }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <mat-card>
-            <div class="table-responsive">
-              <table class="table table-bordered table-hover">
-                <thead>
-                  <tr>
-                    <th class="text-center">Saldo Insoluto</th>
-                    <th class="text-center">Capital</th>
-                    <th class="text-center">Interés</th>
-                    <th class="text-center">IVA</th>
-                    <th class="text-center">Interés + IVA</th>
-                    <th class="text-center">Pago Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="text-center">
-                    <td>{{ amortizacion.saldoInsoluto | currency }}</td>
-                    <td>{{ amortizacion.capital | currency }}</td>
-                    <td>{{ amortizacion.interesOrdinario | currency }}</td>
-                    <td>{{ amortizacion.iva | currency }}</td>
-                    <td>{{ amortizacion.interesMasIva | currency }}</td>
-                    <td>{{ amortizacion.pagoFijo | currency }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </mat-card>
-        </mat-expansion-panel>
-      </mat-accordion>
+    </mat-card>
+  </mat-expansion-panel>
+</mat-accordion>
+
       
 
-<div *ngIf="mostrarPagos" class="col-12 card shadow mb-4 p-3">
+<div *ngIf="mostrarPagos" class="col-12 card shadow mb-4 p-3 mt-3">
     <fieldset class="d-flex align-items-center justify-content-between">
         <div class="alert m-0" role="alert" style="background-color: #023e73; color: white">
             Pagos correspondientes al credito {{ idCreditoSeleccionado }}.
@@ -189,10 +192,10 @@
                 <div class="card shadow-lg p-4">
                     <form [formGroup]="pagoForm">
                         <div class="inputs-container mt-4">
-                            <div class="floating-label">
+                            <!-- <div class="floating-label">
                                 <input type="number" class="inputM" id="id" placeholder="Id Credito" formControlName="idCredito" value="{{ idCreditoSeleccionado }}" readonly>
                                 <label for="id">Id Credito</label>
-                            </div>
+                            </div> -->
                             <div class="floating-label">
                                 <input type="number" class="inputM" id="monto" placeholder="Monto" formControlName="montoPago">
                                 <label for="monto">Monto</label>

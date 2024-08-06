@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, Observable, throwError } from 'rxjs';
@@ -108,4 +108,24 @@ export class CreditosService {
             })
         );
     }
+
+
+    actualizarMoratorios(idCredito: number): Observable<string> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          return throwError(() => new Error('No token found'));
+        }
+        return this.http.put(`${this.apiUrl}/actualizarInteres/${idCredito}`, {}, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          responseType: 'text' // Indica que esperas una respuesta de tipo texto
+        }).pipe(
+          catchError((error: HttpErrorResponse) => {
+            console.error('Error al actualizar los moratorios', error);
+            return throwError(() => new Error('Error al actualizar los moratorios'));
+          })
+        );
+      }
 }

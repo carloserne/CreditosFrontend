@@ -7,6 +7,11 @@
             <i class="fas fa-home"></i> Bienvenida
         </div>
     </div>
+    <div class="menu-item" (click)="navigateTo('/dashboard')">
+        <div (click)="navigateTo('/bienvenida')">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </div>
+    </div>
     <div class="menu-item" (click)="toggleMenu('simulador')">
         <i class="fas fa-money-bill-wave"></i> Créditos
         <div *ngIf="expandedMenu === 'simulador'" class="submenu">

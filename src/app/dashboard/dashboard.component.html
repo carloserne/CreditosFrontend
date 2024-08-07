@@ -1,0 +1,66 @@
+<div class="container">
+    <div class="row">
+        <!-- Card 1 -->
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Gráfica de Estatus</h5>
+                    <div class="d-flex justify-content-center">
+                        <ngx-charts-pie-chart
+                            [view]="view"
+                            [scheme]="colorScheme"
+                            [results]="pieData"
+                            [legend]="showLegend"
+                            [labels]="showLabels"
+                            [doughnut]="doughnut"
+                            [explodeSlices]="explodeSlices">
+                        </ngx-charts-pie-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Amortizaciones por Estatus</h5>
+                    <div class="d-flex justify-content-center">
+                        <ngx-charts-pie-chart
+                            [view]="view"
+                            [scheme]="colorScheme"
+                            [results]="amortizationData"
+                            [legend]="showLegend"
+                            [labels]="showLabels"
+                            [doughnut]="doughnut"
+                            [explodeSlices]="explodeSlices">
+                        </ngx-charts-pie-chart>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Pagos por Estatus</h5>
+                    <div class="d-flex justify-content-center">
+                        <ngx-charts-pie-chart
+                            [view]="view"
+                            [scheme]="colorScheme"
+                            [results]="paymentData"
+                            [legend]="showLegend"
+                            [labels]="showLabels"
+                            [doughnut]="doughnut"
+                            [explodeSlices]="explodeSlices">
+                        </ngx-charts-pie-chart>
+                    </div>
+                </div>
+                <div class="m-3">
+                    <h3>El total de pagos en este mes es de: {{totalMes}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

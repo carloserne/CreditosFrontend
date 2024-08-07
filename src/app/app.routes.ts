@@ -13,11 +13,13 @@ import { ProductoComponent } from './creditos/producto/producto.component';
 import { DetalleCreditoComponent } from './creditos/detalle-credito/detalle-credito.component';
 import { SeguimientoCreditosComponent } from './creditos/seguimiento-creditos/seguimiento-creditos.component';
 import { PagosComponent } from './creditos/pagos/pagos.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'bienvenida', component: BienvenidaComponent, canActivate: [AuthGuard] },
     { path: 'simulador', component: SimuladorVistaComponent, canActivate: [AuthGuard] },
+    { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
     { path: 'creditos/conceptos', component: CatConceptoComponent, canActivate: [AuthGuard] },
     { path: 'creditos/productos', component: ProductoComponent, canActivate: [AuthGuard] },
     { path: 'creditos/detalleCredito', component: DetalleCreditoComponent, canActivate: [AuthGuard] },

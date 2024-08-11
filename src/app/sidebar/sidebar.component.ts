@@ -16,6 +16,8 @@ export class SidebarComponent implements OnInit {
     expandedMenu: string | null = null;
     usuario: IUsuario | null = null;
     errorMessage: any;
+    idRol: number | undefined = 0;
+    nombreRol: string | undefined = '';
 
     constructor(private router: Router, private loginService: LoginService) {}
 
@@ -23,12 +25,44 @@ export class SidebarComponent implements OnInit {
         this.loginService.obtenerUsuario().subscribe(
             (data) => {
                 this.usuario = data;
+                this.nombreRol = this.obtenerNombreRol();
+                console.log(this.nombreRol);
             },
             (error) => {
                 this.errorMessage = error;
             }
         );
     }
+
+    obtenerNombreRol(): string | undefined {
+        let nombreRol: string | undefined;
+        switch (this.usuario?.idRol) {
+            case 1:
+                nombreRol = 'Administrador';
+                break;
+            case 2:
+                nombreRol = 'Promotor';
+                break;
+            case 3:
+                nombreRol = 'Administrador de la empresa';
+                break;
+            case 4:
+                nombreRol = 'Agente de clientes';
+                break;
+            case 5:
+                nombreRol = 'Agente de créditos';
+                break;
+            case 6:
+                nombreRol = 'Agente de cobranza';
+                break;
+            default:
+                return undefined;
+        }
+    
+        this.nombreRol = nombreRol;
+        return nombreRol;
+    }
+    
 
     getImageUrl(base64String: string | undefined): string {
         if (base64String) {
@@ -61,5 +95,4 @@ export class SidebarComponent implements OnInit {
     navigateTo(route: string): void {
         this.router.navigate([route]);
     }
-
 }

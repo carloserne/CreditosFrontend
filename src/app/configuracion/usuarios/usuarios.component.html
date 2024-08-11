@@ -45,16 +45,18 @@
                         <td class="d-flex align-items-center justify-content-center">
                             <ul class="botonp list-unstyled m-0">
                                 <li class="icon-content">
-                                    <a aria-label="modificar" data-social="modificar" (click)="openModal('edit', usuario)">
+                                    <a aria-label="editar" data-social="editar" (click)="openModal('edit', usuario)">
                                         <div class="filled"></div>
                                         <i class="fa fa-pencil-alt fa-lg"></i>
                                     </a>
+                                    <div class="tooltip">Editar</div>
                                 </li>
                                 <li class="icon-content">
                                     <a aria-label="eliminar" data-social="eliminar" (click)="eliminarUsuario(usuario)">
                                         <div class="filled"></div>
                                         <i class="fa fa-trash fa-lg"></i>
                                     </a>
+                                    <div class="tooltip">Eliminar</div>
                                 </li>
                             </ul>
                         </td>

@@ -66,9 +66,26 @@ export class SidebarComponent implements OnInit {
 
     getImageUrl(base64String: string | undefined): string {
         if (base64String) {
+            base64String = this.limpiarBase64(base64String);
             return `data:image/${this.obtenerTipoImagen(base64String)};base64,${base64String}`;
         }
         return '/assets/images/user.jpg';
+    }
+
+    limpiarBase64(base64String: string): string {
+        if (base64String.startsWith('data:image/jpeg;base64,')) {
+            return base64String.replace('data:image/jpeg;base64,', '');
+        }
+        if (base64String.startsWith('data:image/png;base64,')) {
+            return base64String.replace('data:image/png;base64,', '');
+        }
+        if (base64String.startsWith('data:image/gif;base64,')) {
+            return base64String.replace('data:image/gif;base64,', '');
+        }
+        if (base64String.startsWith('data:image/webp;base64,')) {
+            return base64String.replace('data:image/webp;base64,', '');
+        }
+        return base64String; 
     }
 
     obtenerTipoImagen(base64String: string): string {

@@ -12,6 +12,8 @@ import { IPagoAplicado } from '../../interfaces/pagoAplicado';
 import { IPago } from '../../interfaces/pago';
 import { ClientesService } from '../../services/clientes.service';
 import { ICliente } from '../../interfaces/cliente';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 @Component({
     selector: 'app-pagos',
@@ -37,6 +39,55 @@ export class PagosComponent implements OnInit {
     pagos: IPago[] = [];
     cliente: ICliente = {} as ICliente;
     nombreCliente: string = '';
+    
+    generatePdf() {
+        const doc = new jsPDF();
+        let pago = this.pagos.filter(p => p.idPago == this.idPagoAAplicar)[0];
+        let credito = this.creditos.filter(p => p.idCredito == pago.idCredito)[0];
+        this.obtenerCliente(credito.idCliente);
+        let persona = null;
+        let nombreCliente=  "";
+
+        if(this.cliente.datosClienteFisicas){
+            persona = this.cliente.datosClienteFisicas[0].idPersonaNavigation
+            nombreCliente = [
+                persona?.nombre || '',
+                persona?.apellidoPaterno || '',
+                persona?.apellidoMaterno || ''
+              ].filter(part => part.trim() !== '').join(' ');
+        }else if(this.cliente.datosClienteMorals){
+            persona = this.cliente.datosClienteMorals[0].idPersonaMoralNavigation
+            nombreCliente =persona?.razonSocial || '';
+        }
+        
+        const companyName = 'Financlick';
+        const customerName = nombreCliente;
+        const paymentDate = pago.fechaAplicacion;
+        const paymentAmount = "$"+parseFloat(pago.montoPago+'');
+        const paymentFolio = pago.idPago;
+
+
+        doc.setFontSize(16);
+        doc.text(companyName, 20, 20); 
+        doc.setFontSize(12);
+        doc.text('Ticket de Pago', 20, 30);
+
+        doc.line(20, 35, 190, 35);
+
+        doc.setFontSize(10);
+        doc.text(`Nombre del Cliente: ${customerName}`, 20, 45);
+        doc.text(`Fecha de Pago: ${paymentDate}`, 20, 55);
+        doc.text(`Monto Pagado: ${paymentAmount}`, 20, 65);
+        doc.text(`Folio del Pago: ${paymentFolio}`, 20, 75);
+
+        doc.line(20, 80, 190, 80);
+
+        doc.setFontSize(10);
+        doc.text('Gracias por su pago.', 20, 90);
+        doc.text('¡Vuelva pronto!', 20, 100);
+
+        doc.save('ticket_pago.pdf');
+    }
 
 
     constructor(
@@ -168,6 +219,7 @@ export class PagosComponent implements OnInit {
             this.closeModalAplicar();
             this.toastr.success("El pago se aplicó con exito", 'Éxito');
             this.actualizarTablas();
+            this.generatePdf();
         },
         error: (error) => {
             console.error('Error al aplicar el pago:', error);

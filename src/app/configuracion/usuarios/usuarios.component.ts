@@ -8,6 +8,8 @@ import { RolesService } from '../../services/roles.service';
 import { IRol } from '../../interfaces/rol';
 import { IUsuario } from '../../interfaces/usuario';
 import { LoginService } from '../../services/login.service';
+import { EmpresasService } from '../../services/empresas.service';
+import { IEmpresa } from '../../interfaces/empresa';
 
 declare let Swal: any;
 
@@ -21,6 +23,7 @@ declare let Swal: any;
 export class UsuariosComponent implements OnInit {
   usuarios: IUsuarioRol[] = [];
   roles: IRol[] = [];
+  empresas: IEmpresa[] = [];
   usuariosForm: FormGroup;
   modalTitle: string = '';
   passwordVisible: boolean = false;
@@ -29,6 +32,7 @@ export class UsuariosComponent implements OnInit {
   errorMessage: any;
   permiteAcciones: boolean = false;
   idUsuarioSeleccionado: any;
+  usuarioSeleccionado: IUsuarioRol | null = null;
   isLoading: boolean = false;
   @ViewChild('fileInput', { static: false }) fileInput!: ElementRef;
 
@@ -39,7 +43,8 @@ export class UsuariosComponent implements OnInit {
     private toastr: ToastrService,
     private fb: FormBuilder,
     private elementRef: ElementRef,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private empresasService: EmpresasService,
   ) {
     this.usuariosForm = this.fb.group({
       idRol: [0],
@@ -56,43 +61,60 @@ export class UsuariosComponent implements OnInit {
 
   ngOnInit(): void {
     this.obtenerUsuarioLogeado();
-    this.obtenerRoles();
+    // this.obtenerRoles();
     this.obtenerUsuarios();
-    
+    this.obtenerEmpresas();
   }
 
 
   //Metodos CRUD
   gestionarUsuario() {
     if (this.usuariosForm.invalid || !this.selectedImage) {
-      this.toastr.warning('Debe llenar todos los campos y seleccionar una imagen.');
-      return;
+        this.toastr.warning('Debe llenar todos los campos y seleccionar una imagen.');
+        return;
     }
 
     this.isLoading = true;
 
     let usuario: IUsuarioRol = this.usuariosForm.value;
     usuario.imagen = this.selectedImage.toString();
-    usuario.idEmpresa = Number(this.usuarioLogged?.idEmpresa);
+    //usuario.idEmpresa = Number(this.usuarioLogged?.idEmpresa);
 
-    //const accion = usuario.idUsuario ? 'actualizar' : 'guardar';
-    const metodo = this.idUsuarioSeleccionado ? this.usuariosService.actualizarUsuario(this.idUsuarioSeleccionado, usuario) : this.usuariosService.guardarUsuario(usuario);
+    if (this.usuarioLogged?.idRol === 1) {
+        usuario.idRol = Number(this.usuariosForm.get('idEmpresa')?.value);
+    } else {
+        usuario.idEmpresa = Number(this.usuarioLogged?.idEmpresa);
+    }
+
+    // Si la contraseña es una cadena vacía, mantenemos la contraseña actual del usuario
+    if (!usuario.contrasenia) {
+        usuario.contrasenia = this.usuarioSeleccionado?.contrasenia || '';
+    }
+
+    const metodo = this.idUsuarioSeleccionado 
+        ? this.usuariosService.actualizarUsuario(this.idUsuarioSeleccionado, usuario) 
+        : this.usuariosService.guardarUsuario(usuario);
 
     metodo.subscribe({
-      next: (res) => {
-        const mensaje = this.idUsuarioSeleccionado ? 'Usuario actualizado correctamente' : 'Usuario agregado correctamente';
-        this.toastr.success(mensaje, 'Éxito');
-        this.obtenerUsuarios();
-        this.closeModal();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        const mensajeError = usuario.idUsuario ? 'No se pudo actualizar el usuario.' : 'No se pudo agregar el usuario.';
-        this.toastr.error(`${mensajeError} Inténtelo de nuevo más tarde.`, 'Error');
-        this.isLoading = false;
-      }
+        next: (res) => {
+            const mensaje = this.idUsuarioSeleccionado 
+                ? 'Usuario actualizado correctamente' 
+                : 'Usuario agregado correctamente';
+            this.toastr.success(mensaje, 'Éxito');
+            this.obtenerUsuarios();
+            this.closeModal();
+            this.isLoading = false;
+        },
+        error: (error) => {
+            const mensajeError = this.idUsuarioSeleccionado 
+                ? 'No se pudo actualizar el usuario.' 
+                : 'No se pudo agregar el usuario.';
+            this.toastr.error(`${mensajeError} Inténtelo de nuevo más tarde.`, 'Error');
+            this.isLoading = false;
+        }
     });
 }
+
 
   async eliminarUsuario(usuario: IUsuarioRol) {
     const result = await Swal.fire({
@@ -139,12 +161,30 @@ export class UsuariosComponent implements OnInit {
     this.rolService.getRoles().subscribe({
         next: (roles) => {
             this.roles = roles;
+            console.log(this.usuarioLogged?.idRol);
+            // Filtrar si el usuario no es administrador
+            if (this.usuarioLogged?.idRol != 1) {
+                this.roles = this.roles.filter((rol) => rol.idRol != 1);
+            } else {
+                this.roles = roles;
+            }
         },
         error: (error) => {
-            this.toastr.error('No se pudieron obtener los pagos. Inténtelo de nuevo más tarde.', 'Error');
+            this.toastr.error('No se pudieron obtener los roles. Inténtelo de nuevo más tarde.', 'Error');
         }
-    })
-  }
+    });
+}
+
+obtenerEmpresas() {
+  this.empresasService.getEmpresas().subscribe(
+      (data: any[]) => {
+          this.empresas = data;
+      },
+      (error) => {
+          this.toastr.error('No se pudieron obtener las empresas. Inténtelo de nuevo más tarde.', 'Error');
+      }
+  )
+}
 
 
   onFileSelected(event: any) {
@@ -163,24 +203,33 @@ obtenerUsuarioLogeado() {
   this.loginService.obtenerUsuario().subscribe(
     (data) => {
         this.usuarioLogged = data;
+        this.obtenerRoles();
     },
     (error) => {
         this.errorMessage = error;
     }
 );
+
 }
 
   //Funciones para abrir y cerrar el modal
 
   openModal(mode: 'add' | 'edit', usuario?: IUsuarioRol): void {
 
+    if (this.usuarioLogged?.idRol == 1) {
+      this.usuariosForm.get('idEmpresa')?.setValidators([Validators.required]);
+    } else {
+      this.usuariosForm.get('idEmpresa')?.clearValidators();
+    }
+
     if (mode === 'edit' && usuario) {
-        //.log(mode, usuario);
         this.modalTitle = 'Editar usuario';
+        this.usuarioSeleccionado = usuario;
         this.idUsuarioSeleccionado = usuario.idUsuario;
+
+        // Configuramos el formulario para editar el usuario
         this.usuariosForm.patchValue({
             idRol: usuario.idRol,
-            contrasenia: "",
             apellidoPaterno: usuario.apellidoPaterno,
             apellidoMaterno: usuario.apellidoMaterno,
             idEmpresa: usuario.idEmpresa,
@@ -189,11 +238,22 @@ obtenerUsuarioLogeado() {
             imagen: usuario.imagen
         });
 
+        // Hacemos que el campo contraseña no sea obligatorio al editar
+        this.usuariosForm.get('contrasenia')?.clearValidators();
+        this.usuariosForm.get('contrasenia')?.updateValueAndValidity();
+
+        // Guardamos la imagen seleccionada
         this.selectedImage = usuario.imagen;
+
     } else if (mode === 'add') {
         this.idUsuarioSeleccionado = null;
         this.modalTitle = 'Crear usuario';
         this.usuariosForm.reset();
+
+        // Hacemos que el campo contraseña sea obligatorio al agregar
+        this.usuariosForm.get('contrasenia')?.setValidators([Validators.required]);
+        this.usuariosForm.get('contrasenia')?.updateValueAndValidity();
+
         this.selectedImage = null;
     }
 

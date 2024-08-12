@@ -6,6 +6,7 @@ export interface IUsuarioRol {
      apellidoMaterno: string;
      idEmpresa: number;
      usuario1: string;
+     contrasenia: string;
      nombre: string;
      imagen: string;
 }

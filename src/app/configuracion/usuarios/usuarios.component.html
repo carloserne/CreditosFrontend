@@ -128,13 +128,19 @@
                             <div class="floating-label">
                                 <input type="file" class="inputM" id="imagen" (change)="onFileSelected($event)" accept="image/jpeg, image/jpg, image/png" style="width: 100%;">
                             </div>
+                            <div *ngIf="usuarioLogged?.idRol === 1" class="floating-label">
+                                <select class="inputM" id="empresa" formControlName="idEmpresa" placeholder="empresa*" required>
+                                    <option *ngFor="let empresa of empresas" [value]="empresa.idEmpresa">{{ empresa.nombreEmpresa }}</option>
+                                </select>
+                                <label for="rol">Empresa*</label>
+                            </div>
                             <div id="imagePreview" *ngIf="selectedImage" class="image-preview mt-3">
                                 <img [src]="selectedImage" alt="Imagen seleccionada" style="height: 150px; width: 150px;">
                             </div>
                         </div>
                         
 
-                        <div class="modal-footer d-flex justify-content-center">
+                        <div class="modal-footer mt-4 d-flex justify-content-center">
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                             <button type="submit" class="btn btn-success" (click)="gestionarUsuario()" [disabled]="isLoading">Guardar</button>
                         </div>

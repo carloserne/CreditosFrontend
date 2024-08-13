@@ -56,7 +56,7 @@ export class EmpresaComponent implements OnInit {
             numInterior: [''],
             email: ['', Validators.required],
             estatus: [1],
-            logo: ['', Validators.required],
+            logo: [''],
         });
     }
 
@@ -68,12 +68,12 @@ export class EmpresaComponent implements OnInit {
     filterEmpresas(event: any): void {
         const searchTerm = event.target.value.toLowerCase();
         this.filteredEmpresas = this.empresas.filter(empresa => 
-          empresa.razonSocial.toLowerCase().includes(searchTerm) ||
-          empresa.nombreRepresentanteLegal.toLowerCase().includes(searchTerm) ||
-          empresa.rfc.toLowerCase().includes(searchTerm) ||
-          empresa.estado.toLowerCase().includes(searchTerm)
+            empresa.razonSocial.toLowerCase().includes(searchTerm) ||
+            empresa.nombreRepresentanteLegal.toLowerCase().includes(searchTerm) ||
+            empresa.rfc.toLowerCase().includes(searchTerm) ||
+            empresa.estado.toLowerCase().includes(searchTerm)
         );
-      }
+    }
 
     openModal(mode: 'add' | 'edit', empresa?: IEmpresa): void {
         this.modalTitle = mode === 'add' ? 'Agregar Empresa' : 'Editar Empresa';
@@ -144,6 +144,7 @@ export class EmpresaComponent implements OnInit {
         this.empresasService.getEmpresas().subscribe(
             (data: any[]) => {
                 this.empresas = data;
+                console.log(this.empresas);
                 this.filteredEmpresas = this.empresas;
             },
             (error) => {
@@ -153,6 +154,7 @@ export class EmpresaComponent implements OnInit {
     }
 
     guardar(): void {
+        this.empresaForm.patchValue({ estatus: 1 });
         if (this.empresaForm.invalid || !this.selectedImage) {
             this.toastr.warning('Debe llenar todos los campos y seleccionar una imagen.');
             return;

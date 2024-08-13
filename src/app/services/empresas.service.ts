@@ -28,6 +28,21 @@ export class EmpresasService {
         );
     }
 
+    getEmpresa(idEmpresa: number): Observable<IEmpresa> {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            return throwError(() => new Error('No token found'));
+        }
+
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+
+        return this.http.get<IEmpresa>(`${this.apiUrl}/${idEmpresa}`, { headers }).pipe(
+            catchError(this.handleError)
+        );
+    }
+
     guardarEmpresa(empresa: IEmpresa): Observable<IEmpresa> {
         const token = localStorage.getItem('token');
         if (!token) {

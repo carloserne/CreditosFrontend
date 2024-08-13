@@ -81,7 +81,7 @@ export class UsuariosComponent implements OnInit {
     //usuario.idEmpresa = Number(this.usuarioLogged?.idEmpresa);
 
     if (this.usuarioLogged?.idRol === 1) {
-        usuario.idRol = Number(this.usuariosForm.get('idEmpresa')?.value);
+        usuario.idEmpresa = Number(this.usuariosForm.get('idEmpresa')?.value);
     } else {
         usuario.idEmpresa = Number(this.usuarioLogged?.idEmpresa);
     }

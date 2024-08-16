@@ -39,6 +39,7 @@ export class PagosComponent implements OnInit {
     pagos: IPago[] = [];
     cliente: ICliente = {} as ICliente;
     nombreCliente: string = '';
+    montoDeuda: number = 0;
     
     generatePdf() {
         const doc = new jsPDF();
@@ -245,6 +246,27 @@ export class PagosComponent implements OnInit {
             return;
         }else {
             this.pagoAplicado.montoPago = montoPago;
+        }
+
+        this.montoDeuda = 0;
+
+        for (let i = 0; i < this.amortizacionesAct.length; i++) {
+            this.montoDeuda += this.amortizacionesAct[i].capital;
+
+            if (this.amortizacionesAct[i].estatus !== 1) {
+                this.montoDeuda += this.amortizacionesAct[i].interesMasIva;
+            }
+
+            if (this.amortizacionesAct[i].estatus === 3) {
+                this.montoDeuda += this.amortizacionesAct[i].interesMoratorio;
+            }
+        }
+
+        console.log(this.montoDeuda);
+
+        if(montoPago > this.montoDeuda) {
+            this.toastr.warning('Por favor, introduce un valor menor o igual al monto deuda.');
+            return;
         }
 
         this.pagosService.registrarPago(this.pagoAplicado).subscribe({

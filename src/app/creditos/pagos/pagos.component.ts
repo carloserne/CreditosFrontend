@@ -140,21 +140,7 @@ export class PagosComponent implements OnInit {
     }
     obtenerAmortizaciones(idCredito: number) {
         this.calcularMoratorios(idCredito);
-        this.creditosService.obtenerAmortizaciones(idCredito).subscribe({
-            next: (amortizaciones) => {
-                this.amortizacionesAct = amortizaciones;
-                //console.log(this.amortizacionesAct);
-                this.idCreditoSeleccionado = idCredito;
-                //console.log("Id Credito: " + this.idCreditoSeleccionado);
-                this.mostrarAmortizaciones = true;
-                this.mostrarTablaCreditos = false;
-                this.obtenerPagos(idCredito);
-                
-            },
-            error: (error) => {
-                this.toastr.error('No se pudieron obtener las amortizaciones. Inténtelo de nuevo más tarde.', 'Error');
-            }
-    })
+        
     //this.verificarCredito(idCredito);
     }
 
@@ -164,6 +150,23 @@ export class PagosComponent implements OnInit {
             next: (response) => {
                 //console.log(response);
                 //this.actualizarTablas();
+                this.creditosService.obtenerAmortizaciones(idCredito).subscribe({
+                    next: (amortizaciones) => {
+                        this.amortizacionesAct = amortizaciones;
+                        
+                        //console.log(this.amortizacionesAct);
+                        this.idCreditoSeleccionado = idCredito;
+                        //console.log("Id Credito: " + this.idCreditoSeleccionado);
+                        this.mostrarAmortizaciones = true;
+                        this.mostrarTablaCreditos = false;
+                        this.obtenerPagos(idCredito);
+                        
+                    },
+                    error: (error) => {
+                        this.toastr.error('No se pudieron obtener las amortizaciones. Inténtelo de nuevo más tarde.', 'Error');
+                    }
+            })
+
             },
             error: (error) => {
                 this.toastr.error('No se pudieron actualizar los moratorios. Inténtelo de nuevo más tarde.', 'Error');

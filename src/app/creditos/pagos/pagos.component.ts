@@ -418,4 +418,11 @@ export class PagosComponent implements OnInit {
         this.nombreCliente = '';
         this.creditoSeleccionado = {} as ICredito;
     }
+
+    limitarCaracteres(event: any, maxLength: number): void {
+        const input = event.target;
+        if (input.value.length > maxLength) {
+            input.value = input.value.slice(0, maxLength);
+        }
+    }
 }

@@ -38,7 +38,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let o of quejas" class="text-center">
-                        <td>{{ o.tipo }}</td>
+                        <td>
+                            {{ o.tipo === 'Q' ? 'Queja' : (o.tipo === 'S' ? 'Sugerencia' : o.tipo) }}
+                        </td>
                         <td>{{ o.fechaRegistro }}</td>
                         <td>{{ o.estado }}</td>
                         <td>{{ o.descripcion }}</td>

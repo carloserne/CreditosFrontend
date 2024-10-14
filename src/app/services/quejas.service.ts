@@ -8,11 +8,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
     providedIn: 'root'
 })
 export class QuejasService {
-    private apiUrl = 'https://localhost:5000/api/QuejasSugerencias';
+    private apiUrl = 'https://localhost:5000/api/QuejaSugerencium';
 
     constructor(private http: HttpClient, private toastr: ToastrService) { }
 
-    getQuejas(): Observable<IQuejasSugerencias[]> {
+    getQuejas(): Observable<any[]> {
         const token = localStorage.getItem('token');
         if (!token) {
             return throwError(() => new Error('No token found'));
@@ -22,11 +22,10 @@ export class QuejasService {
             'Authorization': `Bearer ${token}`
         });
 
-        return this.http.get<IQuejasSugerencias[]>(this.apiUrl, { headers }).pipe(
+        return this.http.get<any[]>(this.apiUrl, { headers }).pipe(
             catchError(this.handleError)
         );
     }
-
 
     guardarQueja(queja: IQuejasSugerencias): Observable<IQuejasSugerencias> {
         const token = localStorage.getItem('token');
@@ -53,7 +52,7 @@ export class QuejasService {
         if (!token) {
             return throwError(() => new Error('No token found'));
         }
-    
+
         return this.http.put<IQuejasSugerencias>(`${this.apiUrl}/${queja.idQuejaSugerencia}`, queja, {
             headers: {
                 'Authorization': `Bearer ${token}`

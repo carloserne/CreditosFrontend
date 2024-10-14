@@ -28,7 +28,7 @@ export class EmpresasService {
         );
     }
 
-    getEmpresa(idEmpresa: number): Observable<IEmpresa> {
+    getEmpresa(idEmpresa: number | undefined): Observable<IEmpresa> {
         const token = localStorage.getItem('token');
         if (!token) {
             return throwError(() => new Error('No token found'));

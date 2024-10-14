@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef } from '@angular/core';
+import { Component, ElementRef, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IQuejasSugerencias } from '../interfaces/quejas_sugerencias';
 import { ToastrService } from 'ngx-toastr';
 import { QuejasService } from '../services/quejas.service';
+import { LoginService } from '../services/login.service';
+import { IUsuario } from '../interfaces/usuario';
+import { EmpresasService } from '../services/empresas.service';
+import { IEmpresa } from '../interfaces/empresa';
 
 declare let Swal: any;
 
@@ -14,66 +18,39 @@ declare let Swal: any;
     templateUrl: './quejas-sugerencias.component.html',
     styleUrl: './quejas-sugerencias.component.scss'
 })
-export class QuejasSugerenciasComponent {
+export class QuejasSugerenciasComponent implements OnInit {
     modalTitle: string = '';
     quejaForm: FormGroup;
     quejas: IQuejasSugerencias[] = [];
+    usuario: IUsuario | null = null;
+    empresa: IEmpresa | null = null;
 
     constructor(
         private elementRef: ElementRef,
         private fb: FormBuilder,
         private quejasService: QuejasService,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+        private loginService: LoginService,
+        private empresaService: EmpresasService
     ) {
         this.quejaForm = this.fb.group({
-            idQuejaSugerencia: [0],
+            idQuejaSugerencia: [0, Validators.required],
             idEmpresa: [1, Validators.required],
+            idEmpresaNavigation: [null],
             tipo: ['', Validators.required],
             descripcion: ['', Validators.required],
             fechaRegistro: ['', Validators.required],
             estado: [1, Validators.required],
             fechaResolucion: [''],
-            responsable: [1],
+            responsable: [0],
+            responsableNavigation: [null],
             prioridad: [0],
             comentarios: ['']
-        });
-        this.quejas = [
-            {
-                idQuejaSugerencia: 1,
-                idEmpresa: 1,
-                tipo: 'Q',
-                descripcion: 'Demora en la entrega de productos.',
-                fechaRegistro: '2024-09-01',
-                estado: 1,
-                fechaResolucion: '',
-                responsable: 1,
-                prioridad: 1,
-                comentarios: 'Cliente molesto por la tardanza en la entrega.'
-            },
-            {
-                idQuejaSugerencia: 2,
-                idEmpresa: 1,
-                tipo: 'S',
-                descripcion: 'Mejorar el sistema de atención al cliente.',
-                fechaRegistro: '2024-09-15',
-                estado: 1,                fechaResolucion: '2024-09-20',
-                responsable: 1,
-                prioridad: 1,
-                comentarios: 'Sugerencia implementada con éxito.'
-            },
-            {
-                idQuejaSugerencia: 3,
-                idEmpresa: 1,
-                tipo: 'Q',
-                descripcion: 'Producto defectuoso recibido.',
-                fechaRegistro: '2024-09-22',
-                estado: 1,
-                fechaResolucion: '',
-                responsable: 1,
-                prioridad: 1,
-                comentarios: 'Producto será reemplazado.'
-            }
-        ];
+        });        
+    }
+
+    ngOnInit(): void {
+        this.obtenerQuejas();
     }
 
     obtenerQuejas(){
@@ -88,7 +65,6 @@ export class QuejasSugerenciasComponent {
     }
 
     openModalDetalles(queja: IQuejasSugerencias) {
-        console.log(queja)
         if (queja.idQuejaSugerencia == 0) {
             this.toastr.error('No se encontró el ID de la queja.');
             return;
@@ -99,12 +75,14 @@ export class QuejasSugerenciasComponent {
         this.quejaForm.patchValue({
             idQuejaSugerencia: queja.idQuejaSugerencia,
             idEmpresa: queja.idEmpresa,
+            idEmpresaNavigation: queja.idEmpresaNavigation,
             tipo: queja.tipo,
             descripcion: queja.descripcion,
             fechaRegistro: queja.fechaRegistro,
             estado: queja.estado,
             fechaResolucion: queja.fechaResolucion,
             responsable: queja.responsable,
+            responsableNavigation: queja.responsableNavigation,
             prioridad: queja.prioridad,
             comentarios: queja.comentarios
         });
@@ -136,7 +114,6 @@ export class QuejasSugerenciasComponent {
         this.quejaForm.reset();
     }
 
-    // Modal de guardar y editar
     openModal(mode: 'add' | 'edit', queja?: IQuejasSugerencias): void {
         this.modalTitle = mode === 'add' ? 'Agregar queja o sugerencia' : 'Editar queja o sugerencia';
 
@@ -146,12 +123,14 @@ export class QuejasSugerenciasComponent {
             this.quejaForm.patchValue({
                 idQuejaSugerencia: queja.idQuejaSugerencia,
                 idEmpresa: queja.idEmpresa,
+                idEmpresaNavigation: queja.idEmpresaNavigation,
                 tipo: queja.tipo,
                 descripcion: queja.descripcion,
                 fechaRegistro: queja.fechaRegistro,
                 estado: queja.estado,
                 fechaResolucion: queja.fechaResolucion,
                 responsable: queja.responsable,
+                responsableNavigation: queja.responsableNavigation,
                 prioridad: queja.prioridad,
                 comentarios: queja.comentarios
             });
@@ -178,39 +157,93 @@ export class QuejasSugerenciasComponent {
         this.onModalClose();
     }
 
-    guardar(){
-        // this.quejaForm.patchValue({ estatus: 1 });
-        if (this.quejaForm.invalid) {
-            this.toastr.warning('Debe llenar todos los campos');
-            return;
-        }
-
+    async guardar() {
         let queja = this.quejaForm.value;
-        if(queja.idQuejaSugerencia){
+
+        if (queja.idQuejaSugerencia) {
+            if (this.quejaForm.invalid) {
+                this.toastr.warning('Debe llenar todos los campos');
+                return;
+            }
+
             this.quejasService.actualizarQueja(queja).subscribe({
                 next: (response) => {
-                    this.toastr.success('Queja o sugerencia actualizada con exito', "Actualizado");
+                    this.toastr.success('Queja o sugerencia actualizada con éxito', "Actualizado");
                     this.closeModalGE();
-                    // this.objterQuejas();
+                    this.obtenerQuejas();
                 },
                 error: (error) => {
                     this.toastr.error('Error al actualizar la queja o sugerencia', "Error");
                 }
             });
         } else {
-            queja.idQuejaSugerencia = 0;
-            this.quejasService.guardarQueja(queja).subscribe({
+            await this.obtenerUsuario();
+            await this.obtenerEmpresa(this.usuario?.idEmpresa);
+
+            this.quejaForm.patchValue({
+                idQuejaSugerencia: 0,
+                idEmpresa: this.empresa?.idEmpresa, 
+                tipo: queja.tipo,
+                descripcion: queja.descripcion,
+                fechaRegistro: new Date(),
+                estado: 1,
+                fechaResolucion: null,
+                prioridad: 0,
+                comentarios: ''
+            });
+
+            if (!this.quejaForm.value.descripcion) {
+                this.toastr.warning('La descripción es obligatoria');
+                return;
+            }
+
+            if (this.quejaForm.invalid) {
+                this.toastr.warning('Debe llenar todos los campos obligatorios');
+                return;
+            }
+
+            this.quejasService.guardarQueja(this.quejaForm.value).subscribe({
                 next: (response) => {
-                    this.toastr.success('Queja o sugerencia guardada con exito', "Guardado");
+                    this.toastr.success('Queja o sugerencia guardada con éxito', "Guardado");
                     this.closeModalGE();
-                    // this.objterQuejas();
+                    this.obtenerQuejas();
                 },
                 error: (error) => {
                     this.toastr.error('Error al guardar la queja o sugerencia', "Error");
                 }
             });
         }
+    }    
+
+    obtenerUsuario(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.loginService.obtenerUsuario().subscribe({
+                next: (response) => {
+                    this.usuario = response;
+                    resolve();
+                },
+                error: (error) => {
+                    this.toastr.error('Error al obtener el usuario', "Error");
+                    reject();
+                }
+            });
+        });
     }
+    
+    obtenerEmpresa(idEmpresa: number | undefined): Promise<void> {
+        return new Promise((resolve, reject) => {
+            this.empresaService.getEmpresa(idEmpresa).subscribe({
+                next: (response) => {
+                    this.empresa = response;
+                    resolve();
+                },
+                error: (error) => {
+                    this.toastr.error('Error al obtener la empresa', "Error");
+                    reject();
+                }
+            });
+        });
+    }    
 
     async eliminar(queja: IQuejasSugerencias) {
         const result = await Swal.fire({
@@ -228,7 +261,7 @@ export class QuejasSugerenciasComponent {
             this.quejasService.eliminarQueja(queja.idQuejaSugerencia).subscribe({
                 next: () => {
                     this.toastr.success('Queja eliminada con éxito.', 'Eliminado');
-                    // this.obtenerEmpresas();
+                    this.obtenerQuejas();
                 },
                 error: (error) => {
                     this.toastr.error('Error al eliminar la queja.', 'Error');

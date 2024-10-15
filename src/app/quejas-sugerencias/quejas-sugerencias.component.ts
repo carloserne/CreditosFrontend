@@ -75,14 +75,12 @@ export class QuejasSugerenciasComponent implements OnInit {
         this.quejaForm.patchValue({
             idQuejaSugerencia: queja.idQuejaSugerencia,
             idEmpresa: queja.idEmpresa,
-            idEmpresaNavigation: queja.idEmpresaNavigation,
             tipo: queja.tipo,
             descripcion: queja.descripcion,
             fechaRegistro: queja.fechaRegistro,
             estatus: queja.estatus,
             fechaResolucion: queja.fechaResolucion,
-            responsable: queja.responsable,
-            responsableNavigation: queja.responsableNavigation,
+            responsable: 0,
             prioridad: queja.prioridad,
             comentarios: queja.comentarios
         });
@@ -123,14 +121,12 @@ export class QuejasSugerenciasComponent implements OnInit {
             this.quejaForm.patchValue({
                 idQuejaSugerencia: queja.idQuejaSugerencia,
                 idEmpresa: queja.idEmpresa,
-                idEmpresaNavigation: queja.idEmpresaNavigation,
                 tipo: queja.tipo,
                 descripcion: queja.descripcion,
                 fechaRegistro: queja.fechaRegistro,
                 estatus: queja.estatus,
                 fechaResolucion: queja.fechaResolucion,
-                responsable: queja.responsable,
-                responsableNavigation: queja.responsableNavigation,
+                responsable: 0,
                 prioridad: queja.prioridad,
                 comentarios: queja.comentarios
             });

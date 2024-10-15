@@ -8,7 +8,7 @@ export interface IQuejasSugerencias {
     tipo: string,
     descripcion: string,
     fechaRegistro: string,
-    estado: number,
+    estatus: number,
     fechaResolucion?: string
     responsable?: number,
     responsableNavigation?: IUsuario,

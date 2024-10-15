@@ -36,14 +36,12 @@ export class QuejasSugerenciasComponent implements OnInit {
         this.quejaForm = this.fb.group({
             idQuejaSugerencia: [0, Validators.required],
             idEmpresa: [1, Validators.required],
-            idEmpresaNavigation: [null],
             tipo: ['', Validators.required],
             descripcion: ['', Validators.required],
             fechaRegistro: ['', Validators.required],
             estatus: [1, Validators.required],
             fechaResolucion: [''],
             responsable: [0],
-            responsableNavigation: [null],
             prioridad: [0],
             comentarios: ['']
         });        

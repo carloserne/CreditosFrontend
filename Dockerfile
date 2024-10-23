@@ -30,4 +30,4 @@ COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
 EXPOSE 8000
 
 # Start nginx server
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["ng", "serve"]

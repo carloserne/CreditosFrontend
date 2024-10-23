@@ -1,2 +1,9 @@
 [build]
   command = "npm install --legacy-peer-deps && npx ng build --configuration=production --verbose"
+  commandOrigin= "config"
+  publish= "/opt/build/repo/dist/creditos-front-end/browser"
+  publishOrigin= "ui"
+functionsDirectory= "/opt/build/repo"
+[plugins]
+    origin = "ui"
+    package: '@netlify/angular-runtime'

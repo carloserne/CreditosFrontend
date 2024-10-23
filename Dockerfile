@@ -24,4 +24,4 @@ COPY . .
 EXPOSE 4200
 
 # Start the Angular application
-CMD ["ng", "serve", "--disable-host-check", "CreditosFrontEnd", "--port", "4200"]
+CMD ["ng", "serve", "--port", "4200"]

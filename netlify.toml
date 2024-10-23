@@ -1,3 +1,2 @@
 [build]
   command = "npm install --legacy-peer-deps"
-  publish = "dist/creditos-front-end/browser"

@@ -27,7 +27,7 @@ RUN ng build --configuration=production
 #COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
 
 # Expose port 80 for nginx
-EXPOSE 8000
+EXPOSE 8080
 
 # Start nginx server
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "8080"]

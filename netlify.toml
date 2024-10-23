@@ -1,2 +1,2 @@
 [build]
-  command = "npm install --legacy-peer-deps && npm install -g @angular/cli && ng build --configuration=production"
+  command = "npm install --legacy-peer-deps && npx ng build --configuration=production"

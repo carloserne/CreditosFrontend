@@ -6,4 +6,4 @@
 functionsDirectory= "/opt/build/repo"
 [plugins]
     origin = "ui"
-    package= "'@netlify/angular-runtime'"
+    package= "@netlify/angular-runtime"

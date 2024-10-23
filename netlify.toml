@@ -1,2 +1,13 @@
 [build]
-  command = "npm install --legacy-peer-deps && npm run build"
+  # Comando para instalar dependencias y construir el proyecto
+  command = "npm install --legacy-peer-deps --force && npm run build"
+
+[build.environment]
+  # Variables de entorno necesarias para la compilación (si es necesario)
+  NODE_VERSION = "18.17.1"
+
+[[redirects]]
+  # Redirección para manejar rutas en aplicaciones SPA
+  from = "/*"
+  to = "/index.html"
+  status = 200

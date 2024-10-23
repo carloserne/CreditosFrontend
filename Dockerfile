@@ -27,7 +27,7 @@ FROM nginx:alpine
 COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
 
 # Expose port 80 for nginx
-EXPOSE 80
+EXPOSE 8000
 
 # Start nginx server
 CMD ["nginx", "-g", "daemon off;"]

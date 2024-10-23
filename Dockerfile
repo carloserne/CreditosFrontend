@@ -18,7 +18,7 @@ RUN npm install -g @angular/cli
 COPY . .
 
 # Build the Angular project
-RUN ng build --prod
+# RUN ng build
 
 # Expose port 4200 for Angular
 EXPOSE 4200

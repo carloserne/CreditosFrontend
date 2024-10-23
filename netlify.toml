@@ -1,6 +1,2 @@
 [build]
-  command = "npm install --legacy-peer-deps && ng build --configuration=production --verbose"
-  commandOrigin= "config"
-  publish= "dist/creditos-front-end/browser"
-  publishOrigin= "ui"
-functionsDirectory= "/opt/build/repo"
+  command = "npm install --legacy-peer-deps"

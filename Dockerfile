@@ -21,13 +21,13 @@ COPY . .
 RUN ng build --configuration=production
 
 # Use nginx to serve the application in production
-FROM nginx:alpine
+#FROM nginx:alpine
 
 # Copy the built Angular app from the previous stage
-COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
+#COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
 
 # Expose port 80 for nginx
 EXPOSE 8000
 
 # Start nginx server
-CMD ["ng", "serve"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "8000"]

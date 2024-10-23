@@ -1,5 +1,5 @@
 [build]
-  command = "npm install --legacy-peer-deps && npx ng build --configuration=production --verbose"
+  command = "npm install --legacy-peer-deps && ng build --configuration=production --verbose"
   commandOrigin= "config"
   publish= "dist/creditos-front-end/browser"
   publishOrigin= "ui"

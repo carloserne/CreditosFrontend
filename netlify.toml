@@ -4,6 +4,3 @@
   publish= "/opt/build/repo/dist/creditos-front-end/browser"
   publishOrigin= "ui"
 functionsDirectory= "/opt/build/repo"
-[plugins]
-    origin = "ui"
-    package= "netlify-angular-runtime"

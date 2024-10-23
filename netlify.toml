@@ -1,6 +1,3 @@
 [build]
   command = "npm install --legacy-peer-deps"
-  commandOrigin: config
   publish = "/opt/build/repo/dist/creditos-front-end"
-  publishOrigin: config
-functionsDirectory: /opt/build/repo

@@ -1,32 +1,38 @@
-# Use a specific version of Node.js for stability (LTS version recommended)
+# Usar una versión específica de Node.js
 FROM node:18-alpine AS build
 
-# Set the working directory
+# Establecer el directorio de trabajo
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json separately to leverage Docker cache
+# Copiar package.json y package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Instalar dependencias
 RUN npm install --legacy-peer-deps
 
-# Install Angular CLI globally
+# Instalar Angular CLI globalmente
 RUN npm install -g @angular/cli
 
-# Copy the rest of the application code
+# Copiar el resto del código de la aplicación
 COPY . .
 
-# Build the Angular application in production mode
+# Construir la aplicación en modo producción
 RUN ng build --configuration=production
 
-# Use nginx to serve the application in production
+# Usar nginx para servir la aplicación en producción
 FROM nginx:alpine
 
-# Copy the built Angular app to nginx's default html directory
-COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
+# Eliminar la configuración predeterminada de nginx
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Expose port 80
+# Copiar el archivo de configuración personalizado de nginx
+COPY nginx.conf /etc/nginx/conf.d
+
+# Copiar la aplicación Angular construida en el directorio de nginx
+COPY --from=build ./dist/creditos-front-end /usr/share/nginx/html
+
+# Exponer el puerto 80
 EXPOSE 80
 
-# Start nginx server
+# Iniciar el servidor de nginx
 CMD ["nginx", "-g", "daemon off;"]

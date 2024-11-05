@@ -26,7 +26,7 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Copiar los archivos de la aplicación construida en la etapa de construcción
-COPY --from=build /usr/src/app/dist/creditos-front-end /usr/src/app
+COPY --from=build /usr/src/app/dist/creditos-front-end/browser /usr/src/app
 
 # Instalar el paquete de servidor HTTP (http-server) para servir la aplicación
 RUN npm install -g http-server

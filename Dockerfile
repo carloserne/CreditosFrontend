@@ -7,8 +7,7 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json separately to leverage Docker cache
 COPY package*.json ./
 
-# Install dependencies with npm, avoiding deprecated packages where possible
-# Using --legacy-peer-deps to address dependency conflicts
+# Install dependencies
 RUN npm install --legacy-peer-deps
 
 # Install Angular CLI globally
@@ -21,13 +20,13 @@ COPY . .
 RUN ng build --configuration=production
 
 # Use nginx to serve the application in production
-#FROM nginx:alpine
+FROM nginx:alpine
 
-# Copy the built Angular app from the previous stage
-#COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
+# Copy the built Angular app to nginx's default html directory
+COPY --from=build /usr/src/app/dist/creditos-front-end /usr/share/nginx/html
 
-# Expose port 80 for nginx
-EXPOSE 8080
+# Expose port 80
+EXPOSE 80
 
 # Start nginx server
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["nginx", "-g", "daemon off;"]

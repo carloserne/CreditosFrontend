@@ -1,38 +1,38 @@
-# Usar una versión específica de Node.js
+# Etapa de construcción
 FROM node:18-alpine AS build
 
 # Establecer el directorio de trabajo
 WORKDIR /usr/src/app
 
-# Copiar package.json y package-lock.json
+# Copiar los archivos de configuración de npm
 COPY package*.json ./
 
-# Instalar dependencias
+# Instalar las dependencias
 RUN npm install --legacy-peer-deps
 
 # Instalar Angular CLI globalmente
 RUN npm install -g @angular/cli
 
-# Copiar el resto del código de la aplicación
+# Copiar el código de la aplicación
 COPY . .
 
 # Construir la aplicación en modo producción
 RUN ng build --configuration=production
 
-# Usar nginx para servir la aplicación en producción
-FROM nginx:alpine
+# Etapa para servir la aplicación con Node.js
+FROM node:18-alpine
 
-# Eliminar la configuración predeterminada de nginx
-RUN rm /etc/nginx/conf.d/default.conf
+# Crear un directorio para la aplicación en el contenedor
+WORKDIR /usr/src/app
 
-# Copiar el archivo de configuración personalizado de nginx
-COPY nginx.conf /etc/nginx/conf.d
+# Copiar los archivos de la aplicación construida en la etapa de construcción
+COPY --from=build /usr/src/app/dist/creditos-front-end /usr/src/app
 
-# Copiar la aplicación Angular construida en el directorio de nginx
-COPY --from=build ./dist/creditos-front-end /usr/share/nginx/html
+# Instalar el paquete de servidor HTTP (http-server) para servir la aplicación
+RUN npm install -g http-server
 
-# Exponer el puerto 80
-EXPOSE 80
+# Exponer el puerto que usará http-server
+EXPOSE 8080
 
-# Iniciar el servidor de nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Comando para iniciar http-server y servir la aplicación
+CMD ["http-server", "-p", "8080", "."]
